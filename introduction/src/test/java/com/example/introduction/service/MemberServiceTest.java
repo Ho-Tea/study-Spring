@@ -30,12 +30,13 @@ class MemberServiceTest {
 //    public void afterEach() {
 //        memberRepository.clearStore();
 //    }
-    @Test
+
 //    @Commit
+    @Test
     public void 회원가입() throws Exception {
 //Given
         Member member = new Member();
-        member.setName("hello");
+        member.setName("hello2");
 //When
         Long saveId = memberService.join(member);
 //Then
