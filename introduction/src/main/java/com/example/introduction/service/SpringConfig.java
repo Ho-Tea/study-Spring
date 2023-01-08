@@ -1,5 +1,6 @@
 package com.example.introduction.service;
 
+import com.example.introduction.aop.TimeTraceAop;
 import com.example.introduction.repository.JdbcTemplateMemberRepository;
 import com.example.introduction.repository.JpaMemberRepository;
 import com.example.introduction.repository.MemberRepository;
@@ -32,6 +33,11 @@ public class SpringConfig {
 //        //return new JdbcMemberRepository(dataSource);
 ////        return new JdbcTemplateMemberRepository(dataSource);
 //        return new JpaMemberRepository(em);
+//    }
+
+//    @Bean
+//    public TimeTraceAop timeTraceAop(){
+//        return new TimeTraceAop();
 //    }
 
 }
