@@ -29,4 +29,10 @@ public class OrderServiceImpl implements OrderService{
 
         return new Order(memberId, itemName,itemPrice ,discountPrice);
     }
+
+
+    // for Test
+    public MemberRepository getMemberRepository(){
+        return memberRepository;
+    }
 }
