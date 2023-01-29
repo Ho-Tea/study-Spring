@@ -175,7 +175,7 @@
         - 즉, 스프링 컨테이너는 자바코드인지, XML인지 몰라도 되며 오직 BeanDefinition만 알면 된다
         - **역할**과 **구현**의 분리
       <img src = "image/beandefiniton.png">
-      - ```java
+       ```java
         public class BeanDefinitionTest {
             AnnotationConfigApplicationContext ac = new
                           AnnotationConfigApplicationContext(AppConfig.class);
@@ -408,10 +408,237 @@
       <img src = "image/core3.png">
 
 
+  - ### 7) 빈 생명주기 콜백
+    - 스프링 빈은 **객체생성** -> **의존관계 주입** 과 같은 라이프 사이클을 가진다(간단한 버전)
+      - 생성자 주입의 경우에는 위의 과정이 동시에 일어난다
+    - 스프링 빈은 객체를 생성하고, 의존관계 주입이 다 끝난 다음에야 <br>필요한 데이터를 사용할 수 있는 준비가 완료된다  
+      - 따라서, 초기화(필요한 데이터)작업은 의존관계 주입이 모두 완료되고 난 다음에 호출해야 한다.  
+
+    - **스프링은 의존관계 주입이 완료되면 스프링 빈에게 콜백 메서드를 통해 초기화 시점을 알려주고,<br> 스프링 컨테이너가 종료되기 직전 소멸 콜백을 준다**
+    - 즉, 스프링 빈의 이벤트 라이프 사이클은 <br>스프링 컨테이너 생성 -> 스프링 빈 생성 -> 의존관계 주입 -> 초기화 콜백<br> -> 사용 -> 소멸전 콜백 -> 스프링 종료
+      - 초기화 콜백 : 빈이 생성되고, 빈의 의존관계 주입이 완료된 후 호출
+      - 소멸전 콜백 : 빈이 소멸되기 직전에 호출  
+
+    - ### 객체의 생성과 초기화를 분리하자!
+      - 생성자안에서 무거운 초기화 작업을 진행하지말고 객체를 생성하는 부분과<br> 초기화 하는 부분을 명확하게 나누는 것이 유지보수 관점에서 좋다
+
+    - 싱글톤 빈들은 스프링 컨테이너가 종료될때 싱글톤 빈들도 함께 종료되기 때문에 <br>스프링 컨테이너가 종료되기 직전에 소멸전 콜백이 일어난다 (생명주기가 짧은 빈들도 존재 - Scope)
+
+    - 스프링이 지원하는 빈 생명주기 콜백 3가지 방법
+      - 인터페이스(`InitializingBean`, `DisposableBean`)
+      - 설정 정보에 초기화 메서드, 종료 메서드 지정
+        - `@Bean(initMethod = "init", destroyMethod = "close")`
+        - 외부라이브러리를 초기화, 종료할때 사용
+      - `@PostConstruct`, `@PreDestroy` 애노테이션 지원(권장)
+        ```java
+        @PostConstruct
+        public void init(){
+          System.out.println("NetworkClient.init");
+          connect();
+          call("초기화 연결 메시지");
+        }
+
+        @PreDestroy
+        public void close(){
+          System.out.println("NetworkClient.close");
+          disconnect();
+        }
+        ```
+
+  - ### 8) 빈 스코프
+    - 스프링 빈은 기본적으로 싱글톤 스코프로 생성되어, <br> 스프링 컨테이너의 시작과 함께 생성되어서 스프링 컨테이너가 종료될때까지 유지된다
+    - 다양한 스코프
+      - 싱글톤 : 기본, 가장 넓은 범위
+      - 프로토 타입 : 스프링 컨테이너는 프로토타입의 빈의 생성과 의존관계 주입까지만 관여하고,<br> 더는 관리하지 않는 매우 짧은 범위
+        - 스프링 빈 생성 -> 의존관계 주입 -> 초기화 (여기까지만 관리)
+      - 웹 관련 스코프
+        - request : 웹 **요청**이 들어오고 나갈때까지 유지되는 스코프
+        - session : 웹 **세션**이 생성되고 종료될때까지 유지되는 스코프
+        - application : 웹의 서블릿 컨텍스트와 같은 범위로 유지되는 스코프
+      - 예시
+        ```java
+        @Scope("prototype")
+        @Component
+        public class HelloBean{}
+
+        @Scope("prototype")
+        @Bean
+        ProtypeBean HelloBean() {
+          return new HelloBean();
+        }
+        ```
+      - 프로토 타입 스코프 빈
+        <img src = "image/prototype.png">
+        - 클라이언트에 빈을 반환하고, 이후 스프링 컨테이너는 생성된 프로토 타입 빈을 관리하지 않는다
+        - `@PreDestroy`같은 종료 메서드가 호출되지 않는다
+    
+    - 프로토타입 스코프와 싱글톤 스코프를 함께 사용할 경우 발생하는 문제점
+      <img src = "image/together.png">
+      <img src = "image/together2.png">
+      ```java
+      static class ClientBean{
+        private final PrototypeBean prototypeBean;
+
+        @Autowired
+        public ClientBean(PrototypeBean prototypeBean) {
+          this.prototypeBean = prototypeBean;
+        }
+        ...
+      }
+      ```
+
+      - 항상 새로운 프로토 타입 빈을 생성할려면?
+        - 가장 간단한 방법
+          ``` java
+          static class ClientBean{
+
+          @Autowired
+          private ApplictionContext ac;
+
+          public int logic(){
+            PrototypeBean prototypeBean = ac.getBean(PrototypeBean.class);
+            prototypeBean.addCount();
+            int count = prototypeBean.getCount();
+            return count;
+          }
+          ...
+          }
+          ```
+          - 의존관계를 외부에서 주입(DI)받는게 아니라 이렇게 직접 필요한 의존관계를 <br>
+          찾는것을 **Dependency Lookup(DL)** 의존관계 조회라고 한다
+          - 이렇게 스프링의 애플리케이션 컨텍스트 전체를 주입받게 되면, 스프링 컨테이너에 종속적인<br> 코드가 되고, 단위테스트 또한 어려워진다.
+        - 스프링이 제공하는 `ObjectFactory`, `ObjectProvider` 사용
+          ```java
+          @Autowired
+          private ObjectProvider<PrototypeBean> prototypeBeanProvider;
+
+          public int logic(){
+            PrototypeBean prototypeBean = prototypeBeanProvider.getObject();
+            prototypeBean.addCount();
+            int count = prototypeBean.getCount();
+            return count;
+          }
+          ```
+          - `ObjectProvider`의 `getObject()`를 호출하면 내부에서는 스프링 컨테이너를 통해<br> 해당 빈을 찾아서 반환한다(DL) -> 대리자정도
+          - `ObjectProvider`는 지금 딱 필요한 DL정도의 기능만 제공한다
+
+        - 스프링에 의존적이지 않은 JSR-330 Provider
+          ```java
+          @Autowired
+          private Provider<PrototypeBean> provider;
+
+          public int logic(){
+            PrototypeBean prototypeBean = provider.get();
+            prototypeBean.addCount();
+            int count = prototypeBean.getCount();
+            return count;
+          }
+          ```
+          - `Provider`의 `get()`를 호출하면 내부에서는 스프링 컨테이너를 통해<br> 해당 빈을 찾아서 반환한다(DL) -> 대리자정도
+          - `Provider`는 지금 딱 필요한 DL정도의 기능만 제공한다
+          - `ObjectProvider`와의 차이점은 별도의 라이브러리가 필요하고,<br> 자바 표준으로 스프링이 아닌 다른 컨테이너에서도 사용 가능하다는 점이다
+          - **웬만하면 스프링이 제공하는 기능을 이용하자**
+
+    - 웹 스코프
+      - 웹스코프는 웹 환경에서만 동작한다
+      - 프로토타입과 다르게 스프링이 해당 스코프의 종료시점까지 관리(따라서, 종료메서드가 호출된다)
+      - 종류(범위만 다르고 동작 방식은 모두 유사하다)
+        - request : HTTP요청 하나가 들어오고 나갈때 까지 유지되는 스코프<br> 각각의 HTTP요청마다 별도의 빈 인스턴스가 생성되고, 관리된다
+        - session : HTTP Session과 동일한 생명주기를 가지는 스코프
+        - applicaiton : 서블릿 컨텍스트(**ServletContext**)와 동일한 생명주기를 가지는 스코프
+        - websocket : 웹 소켓과 동일한 생명주기를 가지는 스코프
+      <img src = "image/request.png">
 
 
+      - request 웹 스코프
+        - 스프링 부트는 웹 라이브러리가 없으면 지금까지 학습한 `AnnotationConfigApplicationContext`를 기반으로 애플리케이션을 구동한다<br> 웹 라이브러리가 추가되면 웹과 관련된 추가 설정과 환경들이 필요하므로<br> `AnnotationConfigServletWebServerApplicationContext`를 기반으로 애플리케이션을 구동한다
+
+        - 동시에 여러 HTTP요청이 오면 정확히 어떤 요청이 남긴 로그인지 구분하기 어렵다<br> 이때 유용하다
+        ```java
+        @Component
+        @Scope(value = "request")
+        public class MyLogger {
+          private String uuid;
+          private String requestURL;
+          
+          public void setRequestURL(String requestURL) {
+            this.requestURL = requestURL;
+          }
+
+          public void log(String message) {
+            System.out.println("[" + uuid + "]" + "[" + requestURL + "] " + message); 
+          }
+
+          @PostConstruct
+          public void init() {
+            uuid = UUID.randomUUID().toString();
+            System.out.println("[" + uuid + "] request scope bean create:" + this);
+          }
+          @PreDestroy
+          public void close() {
+            System.out.println("[" + uuid + "] request scope bean close:" + this);
+            }
+        }
+        ```
+        - `@Scope(value = "request")`를 사용해서 이제 이 빈은 HTTP요청당 하나씩 생성되고, HTTP요청이 끝나는 시점에 소멸된다
+
+        ``` java
+        @Controller
+        @RequiredArgsConstructor
+        public class LogDemoController {
+          private final LogDemoService logDemoService;
+          private final ObjectProvider<MyLogger> myLoggerProvider;
+
+          @RequestMapping("log-demo")
+          @ResponseBody
+          public String logDemo(HttpServletRequest request) {
+            String requestURL = request.getRequestURL().toString();
+            MyLogger myLogger = myLoggerProvider.getObject();
+            myLogger.setRequestURL(requestURL);
+            myLogger.log("controller test");
+            logDemoService.logic("testId");
+            return "OK";
+          } 
+        }
+        //ObjectProvider덕분에 ObjectProvider.getObject()를 호출하는 시점까지 request scope
+        //빈의 생성을 지연할 수 있었다
+        @Service
+        @RequiredArgsConstructor
+        public class LogDemoService {
+          private final ObjectProvider<MyLogger> myLoggerProvider;
+
+          public void logic(String id) {
+            MyLogger myLogger = myLoggerProvider.getObject();
+            myLogger.log("service id = " + id);
+          } 
+        }
+
+        ```
+        - 참고
+          - requestURL을 MyLogger에 저장하는 부분은 컨트롤러 보다는 <br> 공통 처리가 가능한 스프링 인터셉터나 서블릿 필터 같은 곳을 활용하는 것이 좋다.
+          
+          - 여기서 중요한점이 있다. request scope를 사용하지 않고 파라미터로 이 모든 정보를 서비스 계층에 넘긴다면, 파라미터가 많아서 지저분해진다. <br>더 문제는 requestURL 같은 웹과 관련된 정보가 웹과 관련없는 서비스 계층까지 넘어가게 된다. <br>웹과 관련된 부분은 컨트롤러까지만 사용해야 한다. <br>서비스 계층은 웹 기술에 종속되지 않고, 가급적 순수하게 유지하는 것이 유지보수 관점에서 좋다.  
 
 
+      - `ObjectProvider`가 아닌 프록시를 쓰는 방법
+        ``` java
+        @Component
+        @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+        public class MyLogger {
+        }
+        ```
+        - `proxyMode = ScopedProxyMode.TARGET_CLASS`를 추가
+          - 클래스면 `TARGET_CLASS`
+          - 인터페이스 이면 `INTERFACES` 선택
 
+        - MyLogger의 가짜 프록시 클래스를 만들어두고 HTTP request와 상관없이 <br>가짜 프록시 클래스를 다른 빈에 미리 주입해 둘 수 있다 -> `ObjectProvider`를 사용하지 않아도 된다
+
+        - `CGLIB`라는 라이브러리로 내 클래스를 상속받은 **가짜 프록시 객체**를 만들어서 주입한다
+
+        <img src ="image/proxy.png">
+
+        - 애노테이션의 변경만으로 원본객체를 프록시 객체로 대체할 수 있다 <br> **다형성과 DI컨테이너가 가진 장점**(프록시는 웹 스코프가 아니더라도 사용 가능)
+        - scope는 무분별한 사용을 지양하자
+        
 
 
