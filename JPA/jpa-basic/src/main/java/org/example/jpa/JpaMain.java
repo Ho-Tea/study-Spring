@@ -14,27 +14,29 @@ public class JpaMain {
         et.begin();
 
         try{
-//            Member member = new Member();
-//            member.setId(2L);
-//            member.setName("hi");
+//            Member member1 = new Member(1L, "hss",23);
+//            em.persist(member1);
+//            et.commit();
+            Member member = new Member();
+            member.setUsername("hi");
 //            Member findMember = em.find(Member.class, 1L);
 //            findMember.setName("setName");
-//            em.persist(member);
-//            et.commit();
+            em.persist(member);
+            et.commit();
 //            List<Member> result = em.createQuery("select m from Member as m",Member.class)
 //                    .setMaxResults(10)
 //                    .getResultList();
 //            for(Member member : result){
 //                System.out.println(member.getName());
 //            }
+//
+//            Member member1 = new Member(15L, "A");
+//            Member member2 = new Member(20L, "B");
+//
+//            em.persist(member1);
+//            em.persist(member2);
 
-            Member member1 = new Member(15L, "A");
-            Member member2 = new Member(20L, "B");
 
-            em.persist(member1);
-            em.persist(member2);
-
-            et.commit();
         }catch(Exception e){
             et.rollback();
         }finally {
