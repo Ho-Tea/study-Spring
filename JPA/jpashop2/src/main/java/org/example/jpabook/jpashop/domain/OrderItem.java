@@ -9,10 +9,13 @@ public class OrderItem {
     @Column(name = "Order_Item_Id")
     private Long id;
 
-    @Column(name = "Order_Id")
-    private Long orderId;
-    @Column(name = "Item_Id")
-    private Long itemId;
+    @ManyToOne
+    @JoinColumn(name = "Order_Id")
+    private Order order;
+    @ManyToOne
+    @JoinColumn(name = "Item_Id")
+    private Item item;
+
     private int orderPrice;
     private int count;
 
@@ -24,20 +27,20 @@ public class OrderItem {
         this.id = id;
     }
 
-    public Long getOrderId() {
-        return orderId;
+    public Order getOrder() {
+        return order;
     }
 
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
-    public Long getItemId() {
-        return itemId;
+    public Item getItem() {
+        return item;
     }
 
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
+    public void setItem(Item item) {
+        this.item = item;
     }
 
     public int getOrderPrice() {
