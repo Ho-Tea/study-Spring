@@ -7,7 +7,6 @@ import java.util.List;
 @Entity
 public class Member {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Member_Id")
     private Long id;
 
     @OneToMany(mappedBy = "member")

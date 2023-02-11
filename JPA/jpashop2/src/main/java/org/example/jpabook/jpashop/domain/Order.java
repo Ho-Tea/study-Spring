@@ -10,13 +10,15 @@ import java.util.List;
 @Table(name = "Orders")
 public class Order {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Order_Id")
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "Member_Id")
     private Member member;
 
+    @OneToOne
+    @JoinColumn(name = "Delivery_Id")   //단순하게
+    private Delivery delivery;
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();

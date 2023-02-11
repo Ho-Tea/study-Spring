@@ -6,7 +6,6 @@ import javax.persistence.*;
 @Entity
 public class OrderItem {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Order_Item_Id")
     private Long id;
 
     @ManyToOne
