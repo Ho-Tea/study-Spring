@@ -1,6 +1,7 @@
 package org.example;
 
 import com.sun.org.apache.xpath.internal.operations.Or;
+import org.example.jpabook.jpashop.domain.Movie;
 import org.example.jpabook.jpashop.domain.Order;
 import org.example.jpabook.jpashop.domain.OrderItem;
 
@@ -24,6 +25,18 @@ public class JpaMain {
 //            OrderItem orderItem = new OrderItem();
 //            orderItem.setOrder(order);  //단방향인 경우만으로도 어플리케이션 개발은 문제가 없다
 //            em.persist(orderItem);
+//            em.clear();
+//            em.flush();
+
+            Movie movie = new Movie();
+            movie.setName("JPA");
+            movie.setActor("actor");
+            movie.setDirector("director");
+
+
+            em.persist(movie);
+
+
             tx.commit();
         }catch (Exception e){
             tx.rollback();

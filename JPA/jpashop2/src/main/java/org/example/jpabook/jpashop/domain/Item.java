@@ -6,16 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Item {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Item extends BaseEntity{
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 //
 //    @OneToMany(mappedBy = "item")
 //    private List<OrderItem> orderItems = new ArrayList<>();
 // 중요한게 아니다 상품을 보고 이 상품을 어떤 주문으로 팔렸는지 중요하지는 않으므로
-
-    @ManyToMany(mappedBy = "items")
-    List<Category> categories = new ArrayList<>();
+//
+//    @ManyToMany(mappedBy = "items")
+//    List<Category> categories = new ArrayList<>();
     private String name;
     private int price;
     private int stockQuantity;

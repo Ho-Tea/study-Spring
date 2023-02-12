@@ -19,10 +19,10 @@ public class Category {
     @OneToMany(mappedBy = "parent")
     private List<Category> child;
 
-    @ManyToMany
-    @JoinTable(name = "Category_Item",
-            joinColumns = @JoinColumn(name = "Category_Id"),
-            inverseJoinColumns = @JoinColumn(name = "Item_Id"))
-    private List<Item> items = new ArrayList<>();
+//    @ManyToMany
+//    @JoinTable(name = "Category_Item",
+//            joinColumns = @JoinColumn(name = "Category_Id"),
+//            inverseJoinColumns = @JoinColumn(name = "Item_Id"))
+//    private List<Item> items = new ArrayList<>();
 
 }
