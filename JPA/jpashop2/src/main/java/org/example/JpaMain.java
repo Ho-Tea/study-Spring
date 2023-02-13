@@ -1,9 +1,12 @@
 package org.example;
 
 import com.sun.org.apache.xpath.internal.operations.Or;
+import org.example.jpabook.jpashop.domain.Member;
 import org.example.jpabook.jpashop.domain.Movie;
 import org.example.jpabook.jpashop.domain.Order;
 import org.example.jpabook.jpashop.domain.OrderItem;
+import org.example.jpabook.jpashop.domain.cascade.Child;
+import org.example.jpabook.jpashop.domain.cascade.Parent;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -27,15 +30,35 @@ public class JpaMain {
 //            em.persist(orderItem);
 //            em.clear();
 //            em.flush();
+//
+//            Movie movie = new Movie();
+//            movie.setName("JPA");
+//            movie.setActor("actor");
+//            movie.setDirector("director");
+//            Member member = new Member();
+//            member.setName("hi");
+//            em.persist(member);
+//
+//            em.flush();
+//            em.clear();
+//
+//            Member findMember = em.find(Member.class, member.getId());
+//            Member proxyMember = em.getReference(Member.class, member.getId());
+//
+//            logic(findMember, proxyMember);
+//            System.out.println(findMember.getId());
+//            System.out.println(findMember.getName());
+//
+            Child child1 = new Child();
+            Child child2 = new Child();
 
-            Movie movie = new Movie();
-            movie.setName("JPA");
-            movie.setActor("actor");
-            movie.setDirector("director");
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
 
-
-            em.persist(movie);
-
+            em.persist(parent);
+//            em.persist(child1);
+//            em.persist(child2);   cascade로 따로 안해줘도 persist된다
 
             tx.commit();
         }catch (Exception e){
@@ -45,5 +68,11 @@ public class JpaMain {
         }
         emf.close();
 
+    }
+
+    private static void logic(Member findMember, Member proxyMember) {
+        System.out.println("findMember == proxyMember : "+ (findMember instanceof Member));
+        System.out.println("findMember == proxyMember : "+ (proxyMember instanceof Member));
+        System.out.println("findMember == proxyMember : "+ (proxyMember == findMember));
     }
 }
