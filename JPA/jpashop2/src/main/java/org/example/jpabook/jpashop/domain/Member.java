@@ -2,22 +2,43 @@ package org.example.jpabook.jpashop.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-public class Member extends BaseEntity{
+public class Member{
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "member_Id")
     private Long id;
 
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
     //개발하다 필요하면 양방향을 셋팅하자 양방향은 단순 조회용이다
 
+    @ElementCollection
+    @CollectionTable(name = "Favorite_Food" , joinColumns =
+                @JoinColumn(name = "member_Id"))
+    @Column(name = "food_Name")
+    private Set<String> favoriteFoods = new HashSet<>();
 
+//    @ElementCollection
+//    @CollectionTable(name = "Address", joinColumns =
+//            @JoinColumn(name = "member_Id"))
+//    private List<Address> addressHistory = new ArrayList<>();
+
+    @Embedded
+    private Period period;
+
+    @Embedded
+    private Address homeAddress;
+    @Embedded
+    @AttributeOverrides({@AttributeOverride(name = "city", column = @Column(name = "Work_city")),
+            @AttributeOverride(name = "street", column = @Column(name = "Work_street")),
+            @AttributeOverride(name = "zipcode", column = @Column(name = "Work_zipcode"))})
+    private Address workAddress;
     private String name;
-    private String city;
-    private String street;
-    private String zipcode;
+
 
     public Long getId() {
         return id;
@@ -43,27 +64,4 @@ public class Member extends BaseEntity{
         this.name = name;
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public String getZipcode() {
-        return zipcode;
-    }
-
-    public void setZipcode(String zipcode) {
-        this.zipcode = zipcode;
-    }
 }
