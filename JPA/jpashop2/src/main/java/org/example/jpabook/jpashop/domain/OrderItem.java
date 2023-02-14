@@ -8,7 +8,7 @@ public class OrderItem {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Order_Id")
     private Order order;
 //    @ManyToOne
