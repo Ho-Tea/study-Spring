@@ -49,14 +49,14 @@ public class JpaMain {
 //            System.out.println(findMember.getId());
 //            System.out.println(findMember.getName());
 //
-            Child child1 = new Child();
-            Child child2 = new Child();
-
-            Parent parent = new Parent();
-            parent.addChild(child1);
-            parent.addChild(child2);
-
-            em.persist(parent);
+//            Child child1 = new Child();
+//            Child child2 = new Child();
+//
+//            Parent parent = new Parent();
+//            parent.addChild(child1);
+//            parent.addChild(child2);
+//
+//            em.persist(parent);
 //            em.persist(child1);
 //            em.persist(child2);   cascade로 따로 안해줘도 persist된다
 

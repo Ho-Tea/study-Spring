@@ -1,10 +1,7 @@
 package org.example.jpabook.jpashop.domain;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Member{
@@ -64,4 +61,17 @@ public class Member{
         this.name = name;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Member member = (Member) o;
+        return Objects.equals(id, member.id) && Objects.equals(orders, member.orders) && Objects.equals(favoriteFoods, member.favoriteFoods) && Objects.equals(period, member.period) && Objects.equals(homeAddress, member.homeAddress) && Objects.equals(workAddress, member.workAddress) && Objects.equals(name, member.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, orders, favoriteFoods, period, homeAddress, workAddress, name);
+    }
 }
