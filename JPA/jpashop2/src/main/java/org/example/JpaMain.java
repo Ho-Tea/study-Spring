@@ -12,6 +12,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -59,6 +63,22 @@ public class JpaMain {
 //            em.persist(parent);
 //            em.persist(child1);
 //            em.persist(child2);   cascade로 따로 안해줘도 persist된다
+            //JPQL
+            List<Member> result = em.createQuery(
+                    "select m from Member m where m.name like '%hello'", Member.class
+            ).getResultList();
+
+            //Criteria
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Member> query = cb.createQuery(Member.class);
+
+            Root<Member> m = query.from(Member.class);
+            CriteriaQuery<Member> cq = query.select(m).where(cb.equal(m.get("name"), "kim"));
+            List<Member> resultList = em.createQuery(cq).getResultList();
+
+
+            //QueryDSL
+//            JPAFactoryQuery query = new JPAQueryFactory(em);
 
             tx.commit();
         }catch (Exception e){
