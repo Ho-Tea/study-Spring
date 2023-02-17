@@ -10,6 +10,8 @@
 - 주문 도메인 개발
 - 웹 계층 개발
 
+### JPA기본
+
 <br/>
 
 ## Init
@@ -156,9 +158,11 @@
       - `driver-class`도 현재 등록된 라이브러리를 보고 찾아준다
       - 따라서, 데이터 소스나 JPA 관련된 별도의 추가설정(applicaiton.yml)을 하지 않아도 된다
   
-  
+
+
   - ### 도메인 보충
       <img src = "image/domain2.png">
+
 
 
   - ### 웹 계층(Controller)
