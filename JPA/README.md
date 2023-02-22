@@ -2,6 +2,206 @@
 
 <br/>
 
+### JPA 기본
+- 지금 시대는 객체를 관계형 DB에 관리한다
+- 객체 -> SQL변환 -> RDB
+
+## Init
+  - ### 객체와 관계형 데이터베이스의 차이
+    - 상속
+      - DB에 저장할 객체에는 상속관계 안쓴다
+    - 연관관계
+      - 객체는 참조를 사용
+      - 테이블은 외래키를 사용 
+      - -> 즉 , **서로 연관관계를 바라보는 시선이 다르다**
+      - <img src ="image/graph.jpeg">
+    - 데이터 타입
+    - 데이터 식별 방법
+    - **객체를 자바 컬렉션에 저장하듯이 DB에 저장할 수는 없을까??** <br> -> **JPA**
+  
+  - ### JPA
+    - 자바 진영의 ORM 기술 표준
+    - ORM : 객체 관계 매핑, 객체는 객체대로 설계, RDB는 RDB대로 설계 <br> ORM프레임워크가 중간에서 매핑 -> **패러다임의 불일치를 해결**
+    - **SQL 중심적인 개발에서 객체 중심으로 개발**
+
+      <img src ="image/111.jpeg">
+      <img src ="image/112.jpeg">
+      <img src ="image/113.jpeg">
+      <img src ="image/114.jpeg">
+
+    - ```java 
+      jpa.persist(member) // 저장
+      Member member = jpa.find(memberId)  // 조회 -> 객체 그래프 탐색
+      //동일한 트랜잭션에서 조회한 엔티티는 같음을 보장
+      member.setName("변경할 이름")   //수정
+      jpa.remove(member)  //삭제
+
+      SQL은 JPA가 처리
+      ```
+    - JPA의 성능 최적화 기능
+      - 1차캐시와 동일성 보장(영속성 컨텍스트)
+      - 트랜잭션을 지원하는 쓰기 지연(커밋할때까지 INSERT SQL을 모음)
+      - 지연로딩과 즉시로딩(객체가 실제사용될때 로딩, 한번에 연관된 객체까지 미리 조회)  
+
+    - JPA는 특정 데이터베이스에 종속적이지 않다
+      - <img src ="image/115.jpeg">
+      - javax : 표준 패키지
+      - hibernate : 전용옵션 (hibernate가 아닌 다른 JPA구현체를 사용해도 된다, <br>      내부적으로 JDBC API를 쓴다)
+      - jdbc : java 어플리케이션에서 db에 접속할 수 있도록 도와주는 API<br> 현재 javax.  sql패키지에 포함되어 있다
+
+    - JPA 구동 방식
+      - <img src ="image/116.jpeg">
+      - `EntityManagerFactory`는 하나만 생성해서 애플리케이션 전체에서 공유(DB당 하나)
+      - `EntityManager`는 쓰레드간에 공유 X
+      - JPA의 모든 데이터변경은 트랜잭션 안에서 실행
+    
+    - JPQL
+      - JPA를 사용하면 엔티티 객체를 중심으로 개발
+      - **애플리케이션이 필요한 데이터만 DB에서 불러오려면 <br> 결국 검색조건이 포함된 SQL이 필요하다**
+      - JPA는 SQL을 추상화한 JPQL이란는 객체지향 쿼리 언어를 제공
+      - JPQL은 엔티티 객체를 대상으로 쿼리
+      - SQL은 데이터베이스 테이블을 대상으로 쿼리
+
+- ## 영속성 관리
+  - **JPA에서 가장 중요한 2가지**
+    - 객체와 관계형 DB 매핑
+    - 영속성 컨텍스트
+  - ### 영속성 컨텍스트
+    - 엔티티를 영구저장하는 환경이라는 뜻
+
+      <img src = "image/117.jpeg">
+    - `EntityManger.persist(entity);`
+
+      <img src = "image/118.jpeg">
+    
+    - 엔티티의 생명 주기
+      - 비영속
+        - 영속성 컨텍스트와 전혀 관계가 없는 새로운 상태
+        - JPA와 관계없는 상태
+      - 영속
+        - 영속성 컨텍스트에 관리되는 상태
+        - **persist**
+      - 준영속(**detached**)
+        - 영속성 컨텍스트에 저장되었다가 분리된 상태
+      - 삭제
+        - 삭제된 상태
+
+    - 영속성 컨텍스트의 이점
+      - 1차 캐시
+        - 1차 캐시는 한 트랜잭션 내에서만 이점이 있다 (전체적인 성능향상은 X)
+        - 1차 캐시에 없으면 DB조회 후 1차캐시에 저장한다
+      - 동일성 보장
+      - 트랜잭션을 지원하는 쓰기 지연
+        - 엔티티 매니저는 데이터 변경시 트랜잭션을 시작해야한다
+          ```java
+          EntityManager em = emf.createEntityManager();
+          EntityTransaction transaction = em.getTransaction();
+
+          //엔티티 매니저는 데이터 변경시 트랜잭션을 시작해야 한다
+
+          transaction.begin();
+
+          ...
+
+          transaction.commit();
+          ```
+      - 변경 감지
+        <img src = "image/119.jpeg">
+      - 지연 로딩
+
+    - 플러시(`flush`)
+      - 영속성 컨텍스트의 변경내용을 디비에 반영
+      - 발생
+        - 변경 감지
+        - 수정된 엔티티 쓰기지연 SQL 저장소에 등록
+        - 쓰기 지연 SQL 저장소의 쿼리를 데이터베이스에 전송
+      - 기준
+        - `em.flush : 직접호출` 
+        - 트랜잭션 커밋 : 플러시 자동 호출
+        - JPQL 쿼리 실행 : 플러시 자동 호출
+      - 영속성 컨텍스트를 비우지 않는다
+      - 영속성 컨텍스트의 변경내용을 데이터베이스에 동기화
+
+    - 준영속 상태로 만드는 방법
+      - `em.detach(entity) : 특정 엔티티만 준영속 상태로 전환`
+      - `em.clear() : 영속성 컨텍스트를 완전히 초기화, 1차캐시를 전체 삭제`
+      - `em.close() : 영속성 컨텍스트를 완전히 종료` 
+
+- ## 엔티티 매핑
+  - ### 객체와 테이블 매핑
+    - `@Entity`가 붙은 클래스는 JPA가 관리
+    - 기본 생성자 필수
+    - `final클래스, enum, interface, inner클래스` 사용 불가
+  
+  - ### 데이터베이스 스키마 자동 생성
+    - DDL : 데이터베이스 스키마를 정의하거나 조작하기 위한 언어
+    - DDL을 애플리케이션 실행 시점에 자동 생성
+    - 테이블 중심 -> 객체 중심
+    - 데이터베이스 방언을 활용해서 데이터베이스에 맞는 적절한 DDL생성
+      - Oracle -> `varchar2`, H2 -> `varchar`
+    - 속성
+      - `hibernate.hdm2ddl.auto.create` : 기존 테이블 삭제후 다시 생성
+      - `hibernate.hdm2ddl.auto.create-drop` : create와 같으나 종료시점에 테이블 drop
+    - 운영장비에서는 절대 create, create-drop, update 사용하면 안된다
+    - 스테이징과 운영서버는 validate 또는 none속성을 사용하자
+    - DDL 생성기능
+      - 제약조건 추가 : `@Column(nullable=false, length=10)`
+      - **DDL생성 기능은 DDL을 자동생성할 때만 사용되고, JPA의 실행로직에는 영향을 주지 않는다**
+
+  - ### 필드와 컬럼 매핑
+    - 매핑 어노테이션 정리
+      - `@Column` : 컬럼 매핑
+      - `@Temporal` : 날짜 타입 매핑
+      - `@Enumerated` : enum 타입 매핑 -> **ORDINAL속성 사용 X**
+      - `@Lob` : BLOB, CLOB 매핑 -> 큰 데이터를 넣고 싶다면
+      - `@Transient` : 매핑 무시 -> 메모리에서만 쓰겠다는 뜻
+
+  - ### 기본 키 매핑
+    - `@Id` : 기본키 직접 할당
+    - `@GeneratedValue` : 자동 생성
+      - `IDENTITY` : 데이터베이스에 위임
+        - 기본 키 생성을 데이터베이스에 위임하는 것
+        - 주로 MySQL, SQL Server 에서 사용
+        - ex) MySQL의 AUTO_INCREMENT
+        - JPA는 보통 트랜잭션 커밋 시점에 INSERT SQL 실행
+        - AUTO_INCREMENT는 데이터베이스에 INSERT SQL을 실행한 이후에 ID값을 알수 없다
+        <br> PK값이 DB에 저장된 후에야 알수 있기 때문에 영속성 컨텍스트에 저장되어야 하므로 `em.persist`시점에 즉시 INSERT SQL 실행하고 DB에서 식별자를 조회한다
+        - `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)`
+
+      - `SEQUENCE` : 데이터베이스 시퀀스 오브젝트 사용
+        - 데이터베이스 시퀀스는 유일한 값을 순서대로 생성하는 특별한 데이터베이스
+       오브젝트
+        - 주로 오라클, h2 등에서 사용
+            ``` java
+            @Entity
+            @SequenceGenerator(
+                    name = "MEMBER_SEQ_GENERATOR",
+                    sequenceName = "MEMBER_SEQ",  //매핑할 데이터베이스 시퀀스 이름
+                    initialValue = 1, allocationSize = 1)
+            public class Member {
+            @Id
+            @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBER_SEQ_GENERATOR")
+            private Long id;
+            }
+      
+            ```
+            <img src = "image/120.jpeg">
+            <img src = "image/121.jpeg">
+    
+      - `TABLE` : 키 생성용 테이블 사용
+        - 키 생성 전용 테이블을 하나 만들어서 데이터베이스 시퀀스를 흉내내는 전략
+        - 성능 이슈
+      - `AUTO` : 자동지정(기본값)
+
+    - 권장하는 식별자 전략
+      - 기본키 제약조건 : null x, 유일, 변하면 안된다
+      - 예를 들어 주민등록번호도 기본키로 적절하지 않다
+      - **권장 : Long형 + 대체키(UUID, 순차키) + 키 생성전략 사용**
+
+
+
+
+
 ### JPA활용 1(웹 애플리케이션 개발)
 - 도메인 분석 설계
 - 애플리케이션 구현 준비
@@ -9,8 +209,6 @@
 - 상품 도메인 개발
 - 주문 도메인 개발
 - 웹 계층 개발
-
-### JPA기본
 
 <br/>
 
