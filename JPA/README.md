@@ -164,7 +164,7 @@
         - 주로 MySQL, SQL Server 에서 사용
         - ex) MySQL의 AUTO_INCREMENT
         - JPA는 보통 트랜잭션 커밋 시점에 INSERT SQL 실행
-        - AUTO_INCREMENT는 데이터베이스에 INSERT SQL을 실행한 이후에 ID값을 알수 없다
+        - AUTO_INCREMENT는 데이터베이스에 INSERT SQL을 실행한 이후에 ID값을 알수 있다
         <br> PK값이 DB에 저장된 후에야 알수 있기 때문에 영속성 컨텍스트에 저장되어야 하므로 `em.persist`시점에 즉시 INSERT SQL 실행하고 DB에서 식별자를 조회한다
         - `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)`
 
@@ -190,13 +190,249 @@
     
       - `TABLE` : 키 생성용 테이블 사용
         - 키 생성 전용 테이블을 하나 만들어서 데이터베이스 시퀀스를 흉내내는 전략
-        - 성능 이슈
+        - 성능 이슈 발생
       - `AUTO` : 자동지정(기본값)
 
-    - 권장하는 식별자 전략
+    - **권장하는 식별자 전략**
       - 기본키 제약조건 : null x, 유일, 변하면 안된다
       - 예를 들어 주민등록번호도 기본키로 적절하지 않다
       - **권장 : Long형 + 대체키(UUID, 순차키) + 키 생성전략 사용**
+
+    <img src = "image/123.jpeg">
+    <img src = "image/122.jpeg">
+
+  - ### 데이터 중심 설계의 문제점
+    - 현재 방식은 객체 설계를 테이블 설게에 맞춘 방식 -> XXXXXXX
+    - 테이블의 외래키를 객체에 그대로 가져옴
+    - **객체 그래프 탐색**이 불가능하다(외래키를 그대로 가지고 있으므로)
+
+
+
+- ## 연관관계 매핑
+  - 목표
+    - 객체와 테이블 연관관계의 차이를 이해
+      - 객체는 N:N매핑이 가능하지만 테이블은 그러지 못한다.
+    - 객체의 참조와 테이블의 외래키를 매핑
+
+  - ### 객체지향 설계의 목표는 자율적인 객체들의 협력 공동체를 만드는 것이다
+  
+  - ### 단반향 연관관계
+    <img src = "image/124.jpeg">
+
+    <img src = "image/125.jpeg">
+
+    <img src = "image/126.jpeg">
+
+  - ### 양방향 연관관계와 연관관계의 주인
+    - 테이블은 방향이라는 개녕이 없고(양쪽으로 조인), 객체만 방향이라는 개념이 있지만<br>이것또한 양방향이라는 단어보다는 단뱡향이 2개라는 개념으로 받아들여야한다
+      <img src = "image/127.jpeg">
+      <img src = "image/128.jpeg">
+
+    - 양방향 매핑(반대 방향으로 객체 그래프 탐색)
+      ```java
+      //조회 
+      Team findTeam = em.find(Team.class, team.getId());
+
+      //Team으로 객체그래프를 탐색할 수 있다
+      int memberSize = findTeam.getMembers().size(); //역방향 조회
+      ```
+      <img src = "image/129.jpeg">
+      
+      - 객체의 양방향 관게는 사실 양방향관계가 아니라 서로 다른 단방향 관계 2개이다
+      - 테이블은 외래 키 하나로 두 테이블의 연관관계를 관리
+
+      <img src = "image/130.jpeg">
+
+      - 연관관계의 주인
+        - 양방향 매핑 규칙
+          - 객체의 두 관계중 하나를 연관관계의 주인으로 지정
+            - 객체는 단방향 2개, 테이블은 양방향 1개의 개념이므로 서로 상충된다
+            - 즉, 연관관계의 주인을 지정해주어야 한다
+          - 연관관계의 주인만이 외래키를 관리한다(등록, 수정)
+          - 주인이 아닌쪽은 읽기만 가능해야 한다
+          - 주인은 `mappedBy` 속성 사용 x
+          - 주인이 아니면 `mappedBy` 속성으로 주인을 지정해 주어야 한다
+
+      <img src = "image/131.jpeg">
+      <img src = "image/132.jpeg">
+
+      - 정리
+        - 단방향 매핑만으로도 이미 **연관관계 매핑**은 완료된 상태이다 
+        - 양방향 매핑은 반대방향으로 조회(**객체 그래프 탐색**)기능이 추가된 것 뿐
+          - 양방향 매핑은 테이블에 영향을 주지 않는다
+        - JPQL에서 역방향으로 탐색할 일이 많다 
+
+        즉, 
+        1. 처음 설계시 모두 단방향으로 설계를 완료하자
+        2. 필요하다면 양방향으로 추가 설계를 하자
+      
+      - 연관관계의 주인을 정하는 기준
+        - **비즈니스 로직을 기준으로 연관관계의 주인을 선택하면 안된다**
+        - 연관관계의 주인은 **외래 키**의 위치를 기준으로 정해야 한다
+        - 외래키를 관리하는 참조가 주인
+
+
+- ## 다양한 연관관계 매핑
+  - ### 연관관계 매핑시 고려사항 3가지
+    - 다중성
+      - 다대일(`@ManyToOne`)
+      - 일대다(`@OneToMany`)
+      - 일대일(`@OneToOne`)
+      - 다대다(`@ManyToMany`) -> 쓰지 말자
+    - 단방향, 양방향
+    - **연관관계의 주인**
+      - 다대일 -> 보통 이렇다
+      - 일대다
+        <img src = "image/133.jpeg">
+        - 엔티티가 관리하는 외래 키가 다른 테이블에 있다
+        - 연관관계 관리를 위해 추가로 `UPDATE SQL` 실행
+        - 쓰지말자.
+      - 일대일
+        - 주 테이블(`Member`)이나 대상 테이블(`Locker`) 중에 외래 키 선택 가능
+          - 어디에 상대방에 외래키가 들어가도 상관 없다
+        - 외래 키에 데이터베이스 유니크 제약조건 추가
+          <img src = "image/134.jpeg">
+          <img src = "image/135.jpeg">
+          <img src = "image/136.jpeg">
+          <img src = "image/137.jpeg">
+          <img src = "image/138.jpeg">
+          <img src = "image/139.jpeg">
+          <img src = "image/140.jpeg">
+          <img src = "image/141.jpeg">
+          <img src = "image/142.jpeg">
+
+      - 다대다
+        - 관계형 데이터베이스는 정규화된 테이블 2개로 다대다 관계를 표현할 수 없다
+        - 연결테이블을 추가해서 일대다, 다대일 관계로 풀어내야 한다
+        - `@JoinTable`로 연결 테이블을 지정
+          - 연결테이블이 단순하게 연결만하고 끝나지않고<br> 주문시간, 수량같은 데이터가 들어올 수 있으므로 지양하자 
+        - 아니면, 연결 테이블용 엔티티를 추가로 생성한다(연결테이블을 엔티티로 승격)
+
+    
+- ## 고급 매핑
+  - ### 상속관계 매핑
+    - 관계형 디비는 상속관계가 없다
+    - 슈퍼타입 서브타입 관계라는 모델링 기법이 객체 상속과 유사하다
+    - 상속관계 매핑 : **객체의 상속과 구조**와 **DB의 슈퍼타입 서브타입관계**를 매핑
+    - 구현하는 방법(논리모델을 물리모델로)
+      - 각각 테이블로 변환 (**조인 전략**)
+      - 통합 테이블로 변환 (**단일 테이블 전략**)
+      - 서브타입 테이블로 변환 (**구현 클래스마다 테이블 전략**) - XXXX
+        - **구현 클래스마다 테이블 전략**은 쓰지말자 (비추천)
+
+    - 주요 어노테이션
+      - `@Inheritance(strategy = InheritanceType.JOINED)` - > 조인전략
+      - `@Inheritance(strategy = InheritanceType.SINGLE_TABLE)` -> 단일 테이블 전략
+      - `@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)` -> 구현 클래스마다 테이블 전략
+      - `@DiscriminatorColumn(name="DTYPE")`
+      - `@DiscriminatorValue("B")`
+        <img src = "image/143.jpeg">
+        <img src = "image/144.jpeg">
+        <img src = "image/145.jpeg">
+        <img src = "image/146.jpeg">
+
+  - @MappedSuperclass
+    - 상속관계랑은 상관 없고, 단지 공통 매핑정보가 필요할 때 사용
+    - `Member`랑 `Seller` 가 공통 속성을 `id`, `name`을 가진다면 <br>`BaseEntity`를 두어 거기에 공통으로 사용하는 매핑정보를 모으는 역할
+    - 상속관계 매핑도 아니고,
+    - 엔티티도 아니다 -> 조회, 검색 불가하다
+    - 직접 생성해서 사용할 일이 없으므로 추상클래스 권장
+      ``` java
+      @MappedSuperclass
+      public abstract class BaseEntity {
+
+      private String createdBy;
+      private LocalDateTime createDate;
+      private String lastModifiedBy;
+      private LocalDateTime lastModifiedDate;
+      }
+
+      public class Item extends BaseEntity{
+        ...
+        }
+      // Item 테이블에 BaseEntity 속성들이 컬럼으로 들어간다 그뿐.
+      ```
+
+
+- ## 프록시와 연관관계 관리
+  - ### 프록시
+    - 빈 껍데기
+      <img src = "image/147.jpeg">
+      <img src = "image/148.jpeg">
+
+    - 프록시 객체는 실제 객체의 참조를 보관
+    - 프록시 객체를 호출하면 프록시 객체는 실제 객체의 메소드 호출
+
+      <img src = "image/149.jpeg">
+
+      <img src = "image/150.jpeg">
+
+      <img src = "image/151.jpeg">
+
+    - 프록시 확인
+      - 프록시 인스턴스의 초기화 여부 확인
+        - `PersistenceUnitUtil.isLoaded(Object entity)` `entity`에 `proxy`인스턴스가 들어가면 된다
+      - 프록시 클래스 확인 방법
+        - `entity(= proxy).getClass.getName()` 출력
+      - 프록시 강제 초기화
+        - `org.hibernate.Hibernate.initialize(entity(= proxy))`
+
+  - ### 즉시로딩과 지연로딩
+    - 지연로딩 사용시 -> `Proxy`객체로 조회한다
+      - `Proxy`객체 예 : `class hellojpa.Team$HibernateProxy$yChkvCrz`
+      - 실제 객체를 사용할 시점에 초기화된다(-> DB조회)
+    - 즉시로딩은 말그대로 즉시 연관된 모든 엔티티들을 조회한다
+      - JPA구현체(`Hibernate`)는 가능하면 조인을 사용해서 SQL한번에 함께 조회한다
+      ```java
+      @ManyToOne(fetch = FetchType.LAZY)
+      @ManyToOne(fetch = FetchType.EAGER)
+      ```
+
+  - ### 영속성 전이(CASCADE)
+    - 특정 엔티티를 영속상태로 만들 때 연관된 엔티티도 함께 영속 상태로 만들고 싶을 때
+    - **Persist에 해당한다**
+    - 예시 : `@OneToMany(mappedBy="parent", cascade=CascadeType.PERSIST)`
+    - **영속성 전이는 연관관계를 매핑하는 것과는 아무런 관련이 없다**
+    - 엔티티를 영속화할때 연관된 엔티티도 함께 영속화하는 **편리함**을 제공할 뿐이다
+    - 단일 엔티티에 종속적인 경우에만 사용하도록 하자
+
+    - CASCADE의 종류
+      - ALL : 모두 적용
+      - PERSIST : 영속
+      - REMOVE : 삭제
+      - MERGE : 병합
+      - REFRESG : refresh
+      - DETACH : detach
+
+  - ### 고아 객체
+    - 고아 객체 제거 : 부모 엔티티와 연관관계가 끊어진 자식 엔티티를 자동으로 삭제한다
+    - `orphanRemoval = true`
+    - 참조가 제거된 엔티티는 다른 곳에서 참조하지 않는 고아 객체로 보고 삭제하는 기능
+    - **참조하는 곳이 하나일 때 사용가능하다**
+    - 즉, **특정 엔티티가 개인 소유 할 때** (`@OneToOne`, `@OneToMany`만 가능)
+    - 참고: 개념적으로 부모를 제거하면 자식은 고아가 된다 <br> 따라서 고아 객체 제거 기능을 활성화 하면, 부모를 제거할 때 자식도 함께 제거된다<br> 이것은 `CascadeType.REMOVE`처럼 동작한다
+
+
+
+    - 프록시와 즉시로딩 주의
+      - 가급적 지연로딩만 사용
+      - 즉시로딩을 적용하면 예상하지 못한 SQL이 발생한다
+      - 즉시로딩은 JPQL에서 N+1문제를 일으킨다
+        - 지연로딩 또한 일으키는 경우도 존재한다
+        - N+1 문제 : 각 `Member`에 대한 `Team`을 찾기위한 Query가 또 한번 나가는 경우 <br> 한번 `Member`를 찾는 Query가 나가고 그로 인해 조회된 N명의 `Member`들의 팀을 찾는 Query가 나가는 경우를 의미한다
+
+
+
+
+
+
+  
+
+        
+
+
+    
+
 
 
 
