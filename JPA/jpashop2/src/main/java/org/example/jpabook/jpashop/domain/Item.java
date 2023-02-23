@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Item extends BaseEntity{
+public class Item extends BaseEntity{
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 //
@@ -18,6 +18,7 @@ public abstract class Item extends BaseEntity{
 //    @ManyToMany(mappedBy = "items")
 //    List<Category> categories = new ArrayList<>();
     private String name;
+
     private int price;
     private int stockQuantity;
 
