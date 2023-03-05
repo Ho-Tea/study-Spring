@@ -1,9 +1,10 @@
 package com.example.jpa.repository;
 
+import com.example.jpa.domain.Order;
 import com.example.jpa.domain.OrderSearch;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.Order;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
