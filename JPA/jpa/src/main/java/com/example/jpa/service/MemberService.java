@@ -37,4 +37,12 @@ public class MemberService {
     public Member findOne(Long memberId){
         return memberRepository.findOne(memberId);
     }
+
+    @Transactional
+//  transaction begin, commit을 자동 수행해준다.
+//  예외를 발생시키면, rollback 처리를 자동 수행해준다.
+    public void update(Long id, String name) {
+        Member member = memberRepository.findOne(id);
+        member.setName(name);
+    }
 }

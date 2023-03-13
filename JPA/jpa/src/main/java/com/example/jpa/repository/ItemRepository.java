@@ -1,7 +1,7 @@
 package com.example.jpa.repository;
 
 
-import com.example.jpa.domain.Item;
+import com.example.jpa.domain.item.Item;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

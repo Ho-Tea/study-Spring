@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "Member")
 @Getter @Setter
 public class Member {
     @Id @GeneratedValue

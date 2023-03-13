@@ -1,5 +1,6 @@
-package com.example.jpa.domain;
+package com.example.jpa.domain.item;
 
+import com.example.jpa.domain.Category;
 import com.example.jpa.exception.NotEnoughStockException;
 import jakarta.persistence.*;
 import lombok.Getter;

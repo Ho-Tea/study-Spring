@@ -1,6 +1,7 @@
 package com.example.jpa.service;
 
 import com.example.jpa.domain.*;
+import com.example.jpa.domain.item.Item;
 import com.example.jpa.repository.ItemRepository;
 import com.example.jpa.repository.MemberRepository;
 import com.example.jpa.repository.OrderRepository;
