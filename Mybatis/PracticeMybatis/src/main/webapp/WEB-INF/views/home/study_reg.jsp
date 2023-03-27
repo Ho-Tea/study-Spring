@@ -1,12 +1,6 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.example.PracticeMybatis.vo.StudyVo" %><%--
-  Created by IntelliJ IDEA.
-  User: yoonjuho
-  Date: 2023/03/24
-  Time: 5:22 PM
-  To change this template use File | Settings | File Templates.
---%>
+<%@ page import="com.example.PracticeMybatis.vo.StudyVo" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%

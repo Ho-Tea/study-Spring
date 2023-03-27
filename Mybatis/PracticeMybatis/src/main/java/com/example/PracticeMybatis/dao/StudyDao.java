@@ -12,7 +12,6 @@ public interface StudyDao {
     //공부기록 전체 리스트
     public List<StudyVo> doStudyList();
 
-
     //공부기록 One
     public StudyVo doStudyListOne(String id);
 
