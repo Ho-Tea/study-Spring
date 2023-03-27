@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.PracticeMybatis.dao.StudyDao">
+<!--        <select id="doStudyList" resultType="map">-->
+<!--        select * from study_record-->
+<!--        </select>-->
+        <resultMap id="map_vo_study" type="com.example.PracticeMybatis.vo.StudyVo">
+                <result column="id" property="id"></result>
+                <result column="study_day" property="studyDay"></result>
+                <result column="contents" property="contents"></result>
+                <result column="reg_day" property="regDay"></result>
+        </resultMap>
+
+        <select id="doStudyList" resultMap="map_vo_study">
+                select * from study_record
+        </select>
+
+        <select id="doStudyListOne" resultMap="map_vo_study">
+                select * from study_record  where id = #{id}
+        </select>
+<!--        파라미터타입을 resultMap으로 설정하지말고 다 써줘야했다-->
+        <update id="doStudyUpdate" parameterType="com.example.PracticeMybatis.vo.StudyVo">
+                UPDATE study_record
+                set study_day = #{studyDay} , contents= #{contents}, reg_day = NOW()
+                where id = #{id}
+        </update>
+
+        <delete id="doStudyDelete">
+                delete from study_record where id = #{id}
+        </delete>
+
+        <insert id="doStudyIns">
+                INSERT into study_record(study_day, contents, reg_day)
+                values (#{studyDay}, #{contents}, NOW())
+        </insert>
+</mapper>
+
+
+

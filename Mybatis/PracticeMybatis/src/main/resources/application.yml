@@ -1,0 +1,28 @@
+
+  #jsp view 설정
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/views
+      suffix: .jsp
+
+  #devTools 컴파일 하지않아도 바로 반영되는 것
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: false
+
+
+  #db conn
+  datasource:
+    url: jdbc:mysql://localhost:3306/study?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+    username: jhyoon
+    password: 990220
+  
+  
+
+--- #mybatis mapper xml
+mybatis:
+    mapper-locations: classpath:sqlmapper/*.xml
+    configuration.map-underscore-to-camel-case: true
