@@ -3,6 +3,8 @@ package jpabook.jpashop.api;
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.query.OrderFlatDto;
+import jpabook.jpashop.repository.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.query.OrderQueryDto;
 import jpabook.jpashop.repository.query.OrderQueryRepository;
 import lombok.AllArgsConstructor;
@@ -64,13 +66,26 @@ public class OrderApiController {
     }
 
     @GetMapping("/api/v4/orders")
-    public List<OrderQueryDto> ordersV4(){
+    public List<OrderQueryDto> ordersV4(){  //JPA에서 DTO 직접조회
         return orderQueryRepository.findOrderQueryDtos();
     }
 
     @GetMapping("/api/v5/orders")
-    public List<OrderQueryDto> ordersV5(){
+    public List<OrderQueryDto> ordersV5(){  // JPA에서 DTO 직접조회 컬렉션조회 최적
         return orderQueryRepository.findAllByDto_Optimization();
+    }
+
+    @GetMapping("/api/v6/orders")   //JPA에서 DTO 직접 조회, 플랫데이터 최적화(한방 쿼리)
+    public List<OrderQueryDto> ordersV6(){
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+        // OrdefFlatDto를 OrderQueryDto로 변환하는 과정에서 직접 중복을 제거해 주어야 한다
+        return flats.stream()
+                .collect(Collectors.groupingBy(o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        Collectors.mapping(o -> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), Collectors.toList())))
+                .entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(),e.getKey().getAddress()))
+                .collect(Collectors.toList());
+
     }
 
 
