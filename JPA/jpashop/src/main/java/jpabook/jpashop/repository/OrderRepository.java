@@ -5,10 +5,10 @@ import jakarta.persistence.EntityManager;
 
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import jpabook.jpashop.api.OrderSimpleApiController;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
-import jpabook.jpashop.domain.OrderSearch;
+import jpabook.jpashop.repository.query.OrderQueryDto;
+import jpabook.jpashop.repository.simplequery.SimpleOrderQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -103,7 +103,7 @@ public class OrderRepository {
 
     }
 
-    public List<Order> findAllWithItem(){
+    public List<Order> findAllWithItem(){   //Order기준으로 뽑아온다
         return em.createQuery(
                 "select o from Order o" +
                         " join fetch o.member m" +
@@ -112,5 +112,19 @@ public class OrderRepository {
                         " join fetch oi.item i", Order.class).getResultList();
 
     }
+
+
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit){
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+
 }
 

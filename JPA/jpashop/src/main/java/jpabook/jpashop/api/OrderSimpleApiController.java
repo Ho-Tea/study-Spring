@@ -4,7 +4,7 @@ package jpabook.jpashop.api;
 
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.repository.OrderRepository;
-import jpabook.jpashop.repository.SimpleOrderQueryDto;
+import jpabook.jpashop.repository.OrderSearch;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
