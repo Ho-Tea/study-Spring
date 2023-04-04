@@ -82,6 +82,7 @@
   <img src = "image/was.png">
 
 
+
 ### JDBC
   - 자바에서 DB프로그래밍을 하기위해 사용되는 API
   - **DBCP** : 미리 일정량의 DB커넥션을 생성해서 풀에 저장해 두고있다가 HTTP 요청에 따라 필요할 때 **풀에서 커넥션을 가져다 사용하는 기법**
@@ -92,6 +93,8 @@
   - **HikariCP의 DataSource 사용한다**
 
     
+
+
 ### Web.xml
   - `web.xml`에서 서블릿 맵핑 되는 방법, 인증이 필요한 URL등의 정보를 확인한다
   - `web.xml`은 WebApplication의 Deployment Descriptor(배포 설명자)로써 XML형식의 파일
@@ -110,6 +113,8 @@
     </servlet-mapping>
   </web-app>
   ```
+
+
 
 ## 빌드 도구 종류와 차이점
   - 앤트(Ant)
