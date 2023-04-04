@@ -3,9 +3,9 @@
 
 ## Servlet
 
-  <img src = "image/3.png">
+  <img src = "Image/3.png">
 
-  <img src = "image/4.png">
+  <img src = "Image/4.png">
 
   - 자바 서블릿은 웹 서버와 직접 데이터를 주고 받지 않고 전문 프로그램에의해 관리<br> 이를 서블릿 컨테이너 라고 한다
   - 서블릿 컨테이너 : 서블릿의 생성, 실행 그리고 소멸 등 LifeCycle을 관리하는 CGI프로그램
@@ -17,13 +17,13 @@
   - 자바에서 동적인 웹페이지를 구현하기 위한 표준
   - 클라이언트의 요청을 처리하고, 그 결과를 반환하는 Servlet클래스의 구현 규칙을 지킨 자바 웹 프로그래밍 기술이다
 
-    <img src = "image/servlet3.png">
+    <img src = "Image/servlet3.png">
 
 - ### CGI
   - 웹서버와 애플리케이션 사이에 데이터를 주고받는 규약
   - 프로그램 종류로는 컴파일방식(C, C++, java)과 인터프리터 방식(php, python)방식이 존재한다
-  - <img src = "image/servlet.png">
-  - <img src = "image/servlet2.png">
+  - <img src = "Image/servlet.png">
+  - <img src = "Image/servlet2.png">
 
 **우리는 cgi규칙을 몰라도 된다**  
 
@@ -37,33 +37,33 @@
   - 상태를 유지하게 설계하면 안됨
   - 쓰레드 safety(어떤 공유자원에 여러 쓰레드가 동시에 접근해도 프로그램 실행에 문제가 없는 상태를 의미한다)하지 않다 <br> -> **쓰레드끼리 서로 경쟁한다**
 
-    <img src = "image/arch.png">
+    <img src = "Image/arch.png">
 
-    <img src = "image/dispa.png">
+    <img src = "Image/dispa.png">
 
-    <img src = "image/handler.jpeg">
+    <img src = "Image/handler.jpeg">
 
-    <img src = "image/서블릿.png">
+    <img src = "Image/서블릿.png">
 
   - Spring MVC
     - Spring MVC는 spring에서 제공하는 웹 모듈로 Model, View, Controller 세가지 구성요소를 사용해 <br> 사용자의 다양한 HTTP Request를 처리하고 단순한 텍스트 형식의 응답부터 REST형식의 응답은 물론 <br> View를 표시하는 html을 return하는 응답까지 다양한 응답을 할 수 있도록 하는 프레임 워크
 
-    <img src = "image/프론트.png">
+    <img src = "Image/프론트.png">
 
-    <img src = "image/cont.png">
+    <img src = "Image/cont.png">
 
-    <img src = "image/vi.png">
+    <img src = "Image/vi.png">
 
-    <img src = "image/2.jpeg">
+    <img src = "Image/2.jpeg">
 
-    <img src = "image/1.jpeg">
+    <img src = "Image/1.jpeg">
 
 
 ### JSP
   - HTML내에 자바 코드를 삽입하여 웹 서버에서 동적으로 웹페이지를 생성하여 웹브라우저를 돌려주는 언어
   - JSP(Java Server Pages)는 서블릿 기술을 활용하여 동작하는 웹 프로그래밍 기술입니다.
   - JSP는 서블릿 코드를 자동으로 생성하고, 이를 서블릿 컨테이너에서 실행시킵니다.<br> 따라서 JSP는 사실상 서블릿으로 변환되어 실행되는 것이 맞습니다.
-  - <img src = "image/jsp2.png">
+  - <img src = "Image/jsp2.png">
 
 
 ### Was vs Servlet Container
@@ -77,9 +77,9 @@
   - jar파일 내부를 확인해 보면 tomcat이 인식할 수 있는 구조로 변환되어 있는 것을 알 수 있다
   - 내장 톰캣이 있으므로 단순히 스프링부트에서 `war`파일을 만든다음 터미널에서 실행시키기만 하면 된다.
 
-  <img src = "image/war.png">
+  <img src = "Image/war.png">
 
-  <img src = "image/was.png">
+  <img src = "Image/was.png">
 
 
 
