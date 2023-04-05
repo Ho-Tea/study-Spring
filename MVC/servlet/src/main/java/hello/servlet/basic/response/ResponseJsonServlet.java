@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "responseJsonServlet", urlPatterns = "response-json")
+@WebServlet(name = "responseJsonServlet", urlPatterns = "/response-json")
 public class ResponseJsonServlet extends HttpServlet {
 
     private ObjectMapper objectMapper = new ObjectMapper();
