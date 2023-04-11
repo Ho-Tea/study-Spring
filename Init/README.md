@@ -115,6 +115,12 @@
   ```
 
 
+### Servlet/Spring 에서 Web.xml은 어떻게 사라졌을까?
+- Servlet에서는 web.xml은 SPI(**Service Provider Interface**) 기술을 통해 xml을 없앨 수 있었다
+- Spring-Legacy에서는 HandlesTypes 어노테이션에 <br> WebApplicationInitilizer을 지정하여 효율적으로 사용할 수 있었다
+- Spring-Boot에서는 Auto-Configuration, Spring Container 대체, 빈 설정 등으로 간편하게 사용할 수 있었다.
+
+
 
 ## 빌드 도구 종류와 차이점
   - 앤트(Ant)
