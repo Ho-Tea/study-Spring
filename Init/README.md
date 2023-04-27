@@ -162,3 +162,33 @@
       </target>
       </project>
       ```
+
+
+## Git Flow
+  - Main(= Master)
+    - 실제 운영환경에 담겨있는 코드 브랜치<br>
+    (조심스럽게 다뤄야 하고 안정적인 코드만 존재해야한다)
+  - Dev
+    - 모든 작업내용을 담고있는 브랜치
+  - Feature
+    - 기능 단위의 브랜치
+  - Release
+    - 배포할 것들을 스냅샷 찍는 느낌
+  - Hotfix
+    - 급하게 고쳐야할 버그사항들의 빠른 수정을 위한 브랜치
+
+
+  - Situation
+    - **Release Branch 생성 후 추가작업이 필요해질 경우**
+      - Dev branch를 기준으로 Release branch를 생성
+      - Release Branch를 기준으로 추가 작업을 위한 Branch 생성
+      - 추가 작업이 끝나면 Release Branch에 Merge 후 <br> Release Branch를 Master Branch에 Merge한다
+      - Merge에 추가된 작업 내용을 Dev Branch에 Mastter Branch를 Merge하여 Master와 Dev의 **Sync**를 맞춘다
+      <img src = "image/git.png">
+
+    - **Hotfix가 나가야 할 상황이라면**
+      - 운영에서 장애가 발생하여 Hotfix로 이슈를 수정하여 배포가 나가야 한다면<br> Master Branch를 기준으로 Hotfix Branch를 생성한다
+      - Hotfix Branch에 수정 작업을 진행한다
+      - Hotfix 작업이 끝나면 Master Branch에 Merge한다
+      - Dev Branch에 Master Branch를 **merge**하여 Master와 Dev의 Sync를 맞춘다
+      - 이후 신규 작업은 Dev Branch를 Base로 새로운 Feature Branch를 생성한다
