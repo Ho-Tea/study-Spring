@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'dev.be'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+
+tasks.register("prepareKotlinBuildScriptModel") {}	//중요하지 않은 오류 처리
+
+tasks.bootJar {enabled = false  }   //xxx.jar파일을 만드는데 common모듈은 실행가능한 jar파일이 필요하지 않다(Main클래스가 없다)
+tasks.jar { enabled = true }    //xxx-plain.jar 파일로 생성된다, plain이 붙으면 디펜던시를 가지고있지않다 클래스와 리소스만을 포함하고 있다 -> 실행시킬수 없는 파일

@@ -1,0 +1,11 @@
+profile-name : local
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/multimodule?serverTimezone=Asia/Seoul
+    username: root
+    password: dbswngh!990
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
