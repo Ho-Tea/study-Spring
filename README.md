@@ -1,25 +1,26 @@
-<img src = "image/spring.png" width="500">
-
+<p align = "center">
+<img src = "image/spring1.png" width="500">
+</p>
 
 
 -------------------
 
 
+### [🌱 [자주 헷갈리는 개념들](https://github.com/Ho-Tea/study-Spring/tree/main/Init) ]
 
-### [✅ [자주 헷갈리는 개념들](https://github.com/Ho-Tea/study-Spring/tree/main/Init) ]
-
-<br/>
-
-### [🟢 [JPA](https://github.com/Ho-Tea/study-Spring/tree/main/JPA) ]
 
 <br/>
 
-### [🔴 [Mybatis](https://github.com/Ho-Tea/study-Spring/tree/main/Mybatis) ]
+### [🌿 [Spring Data JPA](https://github.com/Ho-Tea/study-Spring/tree/main/JPA) ]
 
 <br/>
 
-### [🔵 [Spring Boot 기본](https://github.com/Ho-Tea/study-Spring/tree/main/Spring%20Boot) ]
+### [☘️ [Mybatis](https://github.com/Ho-Tea/study-Spring/tree/main/Mybatis) ]
 
 <br/>
 
-### [🟡 [MVC](https://github.com/Ho-Tea/study-Spring/tree/main/MVC) ]
+### [🍀 [Spring Boot Basic](https://github.com/Ho-Tea/study-Spring/tree/main/Spring%20Boot) ]
+
+<br/>
+
+### [🪴 [Spring MVC](https://github.com/Ho-Tea/study-Spring/tree/main/MVC) ]
