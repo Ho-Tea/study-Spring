@@ -192,3 +192,152 @@
       - Hotfix 작업이 끝나면 Master Branch에 Merge한다
       - Dev Branch에 Master Branch를 **merge**하여 Master와 Dev의 Sync를 맞춘다
       - 이후 신규 작업은 Dev Branch를 Base로 새로운 Feature Branch를 생성한다
+
+## Multi Module
+  - **Multi Module이란**
+    - 필요한 기능별로 Module을 생성한다
+    - 레고를 조립하듯 필요한 Module을 조립한다
+    - N개의 Module이 조립되어 있는 프로젝트를 **Multi Module** 프로젝트라 부른다
+      - ex) 로그인 Module, 인증 Module, DB엔티티 Module 등
+      - 예를 들어
+        - API서버에서도 DB Entity가 필요하고,
+        - Batch서버에서도 동일한 DB Entity가 필요하다면
+        - **중복된 Entity를 Module화 시켜 사용하기 위해 Multi Module 프로젝트를 사용한다**
+        - 독립적으로 관리한다면 중복해서 관리해야하므로 Risk가 늘어난다
+  - **Exception 핸들링**
+    - 언어 혹은 프레임워크에서 발생한 Exception은 반드시 **Custom하게 Wrapping**하여 처리한다
+    - `@RestControllerAdvice`어노테이션을 사용하여 모든 예외를 해당 클래스에서 클라이언트와 사전에 정의한 값으로 재정의 한다
+    - ex) NPE일 경우 Error Code를 4001로 내린다
+      - 발생하는 에러에 대한 응답을 일관성 있게, <br> 본인이 원하는 포맷으로 전달할 수 있게 되었습니다.
+      - try-catch문으로 작성했을때 지저분한 부분을 없애준다
+  - 다른 모듈의 빈을 주입받을 경우
+    - 컴포넌트 스캔의 범위를 고려해야한다(`@SpringBootApplication`의 패키지 위치부터 스캔의 대상)
+    - 자주쓰는 방식
+      ``` java
+
+      @SpringBootApplication(
+		      scanBasePackages = {"dev.be.moduleapi", "dev.be.modulecommon"}
+      )
+      public class ModuleApiApplication {
+
+	      public static void main(String[] args) {
+		      SpringApplication.run(ModuleApiApplication.class, args);
+	      }
+
+      }
+
+      ```
+  - DB연동시 모듈 별 build.gradle에 디펜던시를 추가해 주어야 한다
+    - 추가적으로 Entity, Repository 빈들을 주입받을 수 있게끔 컴포넌트 스캔 정의 필요
+      ``` java
+      //repository 와 Entity 스캔범위 또한 지정해 주어야 한다
+      @SpringBootApplication(
+          scanBasePackages = {"dev.be.moduleapi", "dev.be.modulecommon"}
+      )
+      @EntityScan("dev.be.modulecommon.domain")
+      @EnableJpaRepositories(basePackages = "dev.be.modulecommon.repository")
+      public class ModuleApiApplication {
+
+          public static void main(String[] args) {
+            SpringApplication.run(ModuleApiApplication.class, args);
+          }
+
+      }
+
+      ```
+
+    - `❯ curl localhost:8080/find`로 빠르게 검증 가능
+
+  - Gradle을 사용해 빌드 및 배포
+    ``` groovy
+    tasks.register("prepareKotlinBuildScriptModel") {}	//중요하지 않은 오류 처리
+    // 모든 모듈들의 settings.gradle을 삭제함으로써 추가한 사항
+
+    tasks.bootJar {enabled = false  }   //xxx.jar파일을 만드는데 common모듈은 실행가능한 jar파일이 필요하지 않다(Main클래스가 없다)
+    tasks.jar { enabled = true }    //xxx-plain.jar 파일로 생성된다, plain이 붙으면 디펜던시를 가지고있지않다 클래스와 리소스만을 포함하고 있다 -> 실행시킬수 없는 파일
+
+    ```
+
+    `./gradlew clean :module-api:buildNeeded --stacktrace --info --refresh-dependencies -x test`
+    - Module build(test 제외)
+
+  - Profile
+    - 실제 프로젝트에서는 밑의 사진과 같은 파일로 환경별 Property를 구분한다
+      <img src = "image/profile1.png">
+        - 인텔리제이 상에서는 Active profiles를 원하는 환경으로 바꿔주고 구동하면 되고,
+        - 인텔리제이같은 IDE를 사용하지않는경우<br> `java -jar -Dspring.profiles.active=local module-api-0.0.1-SNAPSHOT.jar`로 환경변수를 지정한 채 실행 가능
+    ``` groovy
+        //application-beta.yml 내부
+
+        profile-name : beta
+        spring:
+          datasource:
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            url: jdbc:mysql://localhost:3306/multimodule?serverTimezone=Asia/Seoul
+            username: root
+            password: dbswngh!990
+          jpa:
+            hibernate:
+              ddl-auto: create
+            show-sql: true
+      ```
+
+## 비동기 프로그래밍
+  - 실시간성 응답을 필요로 하지 않는 상황에서 사용한다
+    - Email 전송, Push 알림
+  - **Thread Pool**
+    - 비동기는 `Main Thread`가 아닌 `Sub Thread`에서 작업이 진행
+    - JAVA에서는 `ThreadPool`을 생성하여 `Async`작업을 처리한다
+    - ThreadPool 생성옵션
+      ``` java
+      public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runable> workQueue){
+        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.defaultThreadFactory(), defaultHandler);
+      }
+
+      ThreadPoolExecutor executorPool = new ThreadPoolExecutor(5, 10, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<Runable>(50));
+      // 적어도 5개의 많게는 10개까지의 쓰레드를 생성 3초동안 일을하지 않으면 자원을 반납하고, 큐에는 50개까지의 Task를 담고 있는구나
+      ```
+      - CorePoolSize
+        - 쓰레드 풀의 최소 쓰레드를 몇개 가지고 있을 것이냐
+      - MaxPoolSize
+        - 최대 몇개까지의 쓰레드를 할당할 것이냐
+      - WorkQueue
+        - 먼저들어온 요청을 먼저 처리할수있게끔 자료구조 큐를 이용(요청을 담아놓는 곳)
+      - KeepAliveTime
+        - CorePoolSize보다 더 많은양의 쓰레드들을 점유하고있을때 <br> 지정한 시간만큼 쓰레드들이 일을하고있지않으면 자원을 반납하겠다라는 옵션
+      - 순서
+        - 처음, CorePoolSize만큼 쓰레드를 생성해 놓는다
+        - CorePoolSize가 3인데 request가 4가 들어온다면,
+        - 바로 하나를 더 생성하는것이 아니라 우선 WorkQueue에 담아 놓는다
+        - WorkQueue의 크기만큼 새로운 요청을 받아 들이다가 다 차면
+        - MaxPoolSize만큼 쓰레드를 생성하게 된다.
+  - `@EnableAsync` : Async를 쓸수 있는 어노테이션
+
+  - 특정 로직의 실행이 끝날때까지 기다리는 것이 아닌 다른일을 먼저 처리하는 것
+  - 스프링에서의 비동기
+    - `AppConfig`(쓰레드 풀 생성)
+      <img src = "image/async2.png">
+
+    - `EmailSerivce`(쓰레드 풀 설정)
+      <img src = "image/async1.png">
+    
+    - `AsyncConfig`(**Async를 사용할 수 있게끔 구성하는 것**)
+      <img src = "image/async3.png">
+
+    
+    <img src = "image/async.png">
+
+    - `asyncCall_1`은 빈주입을 받아서 사용하는 것
+      - 모두 다른 쓰레드가 처리 -> 비동기적 방식
+    - `asyncCall_2`는 일반적으로 인스턴스를 생성
+      - 모두 같은 쓰레드가 처리 -> 동기적 방식
+    - `asyncCall_3`은 내부 클래스안에 Async애노테이션으로 구성
+      - 모두 같은 쓰레드가 처리 -> 동기적 방식
+    - 기본적으로 스프링에서 **비동기적**으로 처리하기 위해서는 스프링의 도움이 필요하다
+    - 스프링 프레임워크가 내가 비동기로 처리하고자 하는 메서드(**그 메서드 들을 가지고있는 `EmailService`는 빈으로 등록이 되어있다**)
+    <br> 그 빈을 가지고 왔을때 순수한 빈을 `AsyncService`에 반환하는 것이 아니다
+    - `EmailService`같은경우는 Async하게 동작을 해야 하므로 한번더 프록시 객체로 Wrapping 해준다 
+    - `emailService.sendMail()` 이때, 비동기로 동작할 수 있게 Sub Thread에게 위임해준다
+    - 3번째의 경우 이미 AsyncService는 빈(자신)을 가지고 왔다
+      - 이 경우 메서드에 다이렉트로 접근하므로, Wrapping된 빈을 사용해야하는데 그러지 못한다<br> -> 동기적 처리
+    - **중요한것은 스프링컨테이너에 등록된 빈을 사용해야 한다**
