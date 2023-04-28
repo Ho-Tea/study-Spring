@@ -1,6 +1,19 @@
 # 💡 헷갈려하는 정의나 개념을 정리하는 곳
 
 
+- [**1. 서블릿**](#Servlet)
+- [**2. 서블릿 컨테이너**](#Servlet-Container)
+- [**3. Was VS ServletContainer**](#Was-vs-Servlet-Container)
+- [**4. Web.xml이 사라진 이유**](#Web.xml)
+- [**5. Ant**](#ANT)
+- [**6. MultiModule**](#Multi-Module)
+- [**7. Spring Profile**](#Profile)
+- [**8. Async**](#비동기-프로그래밍)
+
+----------------
+
+
+
 ## Servlet
 
   <img src = "Image/3.png">
@@ -29,7 +42,7 @@
 
 **웹서버와 cgi규칙으로 데이터를 주고받는 스크립트 엔진, 서블릿 컨테이너**
 
-## Servlet Container(서블릿 컨테이너)
+## Servlet Container
   - 서블릿의 생성부터 소멸까지의 라이프 사이클을 관리하는 역할
   - 서블릿 컨테이너는 웹 서버와 소켓을 만들고 통신하는 과정을 대신 처리해준다
   - **개발자는 비즈니스 로직에만 집중하면 된다**
@@ -261,7 +274,7 @@
     `./gradlew clean :module-api:buildNeeded --stacktrace --info --refresh-dependencies -x test`
     - Module build(test 제외)
 
-  - Profile
+  - ### Profile
     - 실제 프로젝트에서는 밑의 사진과 같은 파일로 환경별 Property를 구분한다
       <img src = "Image/profile1.png">
         - 인텔리제이 상에서는 Active profiles를 원하는 환경으로 바꿔주고 구동하면 되고,
