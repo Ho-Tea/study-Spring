@@ -442,16 +442,21 @@
       - <img src = "image/view.png">
         - (1) 핸들러 어댑터 호출
           - 핸들러 어댑터를 통해 `new-form` 이라는 논리 뷰 이름을 흭득한다
+
         - (2) ViewResolver 호출
           - `new-form`이라는 뷰 이름으로 `viewResolver`를 순서대로 호출한다
           - `BeanNameViewResolver`는 `new-form`이라는 이름의 `스프링 빈`으로 등록된 뷰를 찾아야 하는데 없다면
           - `InternalResourceViewResolver`가 호출된다
+
         - (3) `InternalResourceViewResolver`
           - 이 뷰 리졸버는 `InternalResourceView`를 반환한다
+
         - (3) `InternalResourceView`
           - `InternalResourceView`는 JSP처럼 포워드`forward()`를 호출해서 처리할 수 있는 경우에 사용한다
+
         - (4) view.render()
           - `view.render()`가 호출되고 `InternalResourceView`는 `forward()`를 사용해서 JSP를 실행한다
+          
         - 다른 뷰는 실제 뷰를 렌더링하지만, JSP의 경우 `forward()`통해서 해당 JSP로 이동해야 렌더링이 된다
         - JSP를 제외한 나머지 뷰 템플릿들은 `forward()`과정 없이 바로 렌더링 된다.
         - Thymeleaf 뷰 템플릿을 사용하면 `ThymeleafViewResolver`를 등록해야 한다
