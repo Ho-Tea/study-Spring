@@ -184,7 +184,7 @@
       - Release Branch를 기준으로 추가 작업을 위한 Branch 생성
       - 추가 작업이 끝나면 Release Branch에 Merge 후 <br> Release Branch를 Master Branch에 Merge한다
       - Merge에 추가된 작업 내용을 Dev Branch에 Mastter Branch를 Merge하여 Master와 Dev의 **Sync**를 맞춘다
-      <img src = "image/git.png">
+      <img src = "Image/git.png">
 
     - **Hotfix가 나가야 할 상황이라면**
       - 운영에서 장애가 발생하여 Hotfix로 이슈를 수정하여 배포가 나가야 한다면<br> Master Branch를 기준으로 Hotfix Branch를 생성한다
@@ -263,7 +263,7 @@
 
   - Profile
     - 실제 프로젝트에서는 밑의 사진과 같은 파일로 환경별 Property를 구분한다
-      <img src = "image/profile1.png">
+      <img src = "Image/profile1.png">
         - 인텔리제이 상에서는 Active profiles를 원하는 환경으로 바꿔주고 구동하면 되고,
         - 인텔리제이같은 IDE를 사용하지않는경우<br> `java -jar -Dspring.profiles.active=local module-api-0.0.1-SNAPSHOT.jar`로 환경변수를 지정한 채 실행 가능
     ``` groovy
@@ -316,16 +316,16 @@
   - 특정 로직의 실행이 끝날때까지 기다리는 것이 아닌 다른일을 먼저 처리하는 것
   - 스프링에서의 비동기
     - `AppConfig`(쓰레드 풀 생성)
-      <img src = "image/async2.png">
+      <img src = "Image/async2.png">
 
     - `EmailSerivce`(쓰레드 풀 설정)
-      <img src = "image/async1.png">
+      <img src = "Image/async1.png">
     
     - `AsyncConfig`(**Async를 사용할 수 있게끔 구성하는 것**)
-      <img src = "image/async3.png">
+      <img src = "Image/async3.png">
 
     
-    <img src = "image/async.png">
+    <img src = "Image/async.png">
 
     - `asyncCall_1`은 빈주입을 받아서 사용하는 것
       - 모두 다른 쓰레드가 처리 -> 비동기적 방식
