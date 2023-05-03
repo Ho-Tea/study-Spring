@@ -456,6 +456,27 @@
       - remote -> remote
         - Server Config 파일
     - `SSH`를 사용하므로 **SSH key** 혹은 Password가 필요하다
+      - 처음 접속은 `key`로 그 후 `Password`로 접속하게끔 수정 가능
       - `SSH`:네트워크 프로토콜 중 하나로 컴퓨터와 컴퓨터가 인터넷과 같은 Public Network를 통해서 서로 통신을 할 때<br> 보안적으로 안전하게 통신을 하기 위해 사용하는 프로토콜이다.
     - 일반적인 상황
       - `scp file.txt remote_username@1.1.1.1:/remote/directory`
+
+
+## AWS
+  - **CI/CD란?**
+    - CI(`Continuous Integration`) : 자동으로 프로젝트에 코드가 머지된다
+    - CD(`Continuous Deployment`) : 자동으로 코드가 배포된다
+    - 개발을 좀 더 수월하게 하기 위해 사용한다
+  - **EC2**
+  - **IAM**
+    - `IAM`(`AWS Identity and Access Management`)은 AWS리소스(`EC2, S3, RDS` 등)를 사용하도록 인증 및 권한 부여된 대상을 제어합니다.
+  - **Code Deploy**
+    - `AWS CodeDeploy`는 Amazon EC2 인스턴스 및 온프레미스에서 실행 중인 인스턴스를 비롯하여 모든 인스턴스에 대한 **코드 배포**를 자동화하는 서비스입니다.
+    - 
+  - **RDS**
+    - 원격 DB를 설정하는 것
+  - **S3**
+    - 원격 저장소
+
+## GitHub Actions
+  - **GitHub Actions**는 GitHub에서 제공하는 서비스로, 빌드, 테스트, 배포 파이프라인을 자동화할 수 있는 <br> `CI(Continuous Integration, 지속 통합)`와 `CD(Continuous Deployment, 지속 배포)` 플랫폼입니다.
