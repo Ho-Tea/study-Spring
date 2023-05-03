@@ -9,6 +9,8 @@
 - [**6. MultiModule**](#Multi-Module)
 - [**7. Spring Profile**](#Profile)
 - [**8. Async**](#비동기-프로그래밍)
+- [**9. Feign Client**](#Feign-Client)
+- [**10. 배포파일 원격 전송**](#SCP)
 
 ----------------
 
@@ -350,7 +352,110 @@
     - 스프링 프레임워크가 내가 비동기로 처리하고자 하는 메서드(**그 메서드 들을 가지고있는 `EmailService`는 빈으로 등록이 되어있다**)
     <br> 그 빈을 가지고 왔을때 순수한 빈을 `AsyncService`에 반환하는 것이 아니다
     - `EmailService`같은경우는 Async하게 동작을 해야 하므로 한번더 프록시 객체로 Wrapping 해준다 
+      <img src ="image/async5.png">
     - `emailService.sendMail()` 이때, 비동기로 동작할 수 있게 Sub Thread에게 위임해준다
     - 3번째의 경우 이미 AsyncService는 빈(자신)을 가지고 왔다
       - 이 경우 메서드에 다이렉트로 접근하므로, Wrapping된 빈을 사용해야하는데 그러지 못한다<br> -> 동기적 처리
     - **중요한것은 스프링컨테이너에 등록된 빈을 사용해야 한다**
+
+## Feign Client
+  - 프로그래밍을 하다보면 외부 컴포넌트와 통신을 하는 일이 발생한다
+    - 예) `RestTemplate`, 요즘은 `Feign Client`를 더 많이 쓴다
+    ``` groovy
+    feign:
+      url:
+        prefix: http://localhost:8080/target_server #DemofeignClient에서 사용할 url prefix 값
+      client:
+        config:
+          default:
+            connectTimeout: 1000
+            readTimeout: 3000
+            loggerLevel: NONE
+          demo-client: # DemoFeignClient에서 사용할 Client 설정 값
+            connectTimeout: 1000
+            readTimeout: 10000
+            loggerLevel: HEADERS  # 여기서 설정한 값은 FeignCustomerLogger -> Logger.Level logLevel 변수에 할당됨
+        
+    
+    ```
+  - **Feign Feature**
+    - **Connection/Read Timeout**
+      - 외부 서버와 통신 시 Connection/Read Timeout설정이 가능하다
+      ``` java
+        @FeignClient(
+        name = "demo-client"
+        , url = "${feign.url.prefix}",   // 요청을 보내고자 하는 타켓 URL
+        configuration = DemoFeignConfig.class
+        )
+        public interface DemoFeignClient {
+
+        @GetMapping("/get")
+        ResponseEntity<BaseResponseInfo> callGet(@RequestHeader("CustomHeaderName") String customHeader,
+                                             @RequestParam("name") String name,
+                                             @RequestParam("age") Long age);
+                                              }
+
+       ```
+      - `DemoController` -> `DemoService` -> `DemoFeignClient` -> `DemoFeignClient.callGet` ->  `TargetController`
+    - **Feign Interceptor**
+      - 외부로 요청이 나가기 전에 만약 공통적으로 처리해야 하는 부분이 있다면 <br> Interceptor를 재정의 하여 처리가 가능하다
+      ``` java
+      @Bean
+      public DemoFeignInterceptor feignInterceptor() {
+        return DemoFeignInterceptor.of();
+      }
+
+
+
+      @RequiredArgsConstructor(staticName = "of") // return DemoFeignInterceptor.of();
+      public class DemoFeignInterceptor implements RequestInterceptor {
+        @Override
+        public void apply(RequestTemplate template) {
+          //Get 요청의 경우
+          if(template.method() == Request.HttpMethod.GET.name()){
+              System.out.println("[GET] [DemoFeignInterceptor] queries :" + template.queries());
+              return;
+          }
+
+          //Post 요청의 경우
+          String encodedRequestBody = StringUtils.toEncodedString(template.body(), StandardCharsets.UTF_8); //Apache Commons Lang3  
+          //Encoding : binary data -> String
+          System.out.println("[POST] [DemoFeignInterceptor] requestBody: " +encodedRequestBody);
+
+          // 추가적으로 본인이 필요한 로직을 추가
+          String convertRequestBody = encodedRequestBody;
+          template.body(convertRequestBody);
+        }
+      }
+      ```
+    - Feign Logger
+      - Request/Response등 운영을 하기 위한 적절한 Log를 남길 수 있다<br>
+      -생략-
+
+    - Feign ErrorDecoder
+      - 요청에 대해 정상응답이 아닌 경우 핸들링이 가능하다<br> -생략-
+
+## Apache Commons Lang 3
+  - Apache CommonsLang 3라이브러리는 자바의 API의 핵심 클래스의 **조작에 대한 자원을 제공한다** <br> 이 자원에는 문자열, 숫자, 날짜, 동시성, 개체반사등을 처리하는 메서드가 포함된다
+  - `StringUtils`
+    - `StringUtils`클래스는 문자열에 대한 `null-safe` 작업을 위한 메서드를 제공한다
+    - 이 클래스의 많은 메서드에는 클래스 `java.lang.String`에 정의된 해당 메서드가 있다. 
+    - 이것은 `null-safe`가 아니다. 그러나 `String` 클래스에 동등한 항목이 없는 여러 메서드에 중점을 둔다.
+
+
+
+## 배포파일 원격 전송
+  - ### SCP
+    - allows you to securely copy files and directories between two locations.
+    <br> (비슷한 예로는 `FTP`가 존재)
+    - 사용되는 상황
+      - local -> remote
+        - HTTPS 통신을 할때 필요한 SSL 인증서를 보낼때 사용
+      - remote -> local
+        - Heap Dump 파일과 같은 로그 파일들을 분석하기 쉽게 보낼때 사용
+      - remote -> remote
+        - Server Config 파일
+    - `SSH`를 사용하므로 **SSH key** 혹은 Password가 필요하다
+      - `SSH`:네트워크 프로토콜 중 하나로 컴퓨터와 컴퓨터가 인터넷과 같은 Public Network를 통해서 서로 통신을 할 때<br> 보안적으로 안전하게 통신을 하기 위해 사용하는 프로토콜이다.
+    - 일반적인 상황
+      - `scp file.txt remote_username@1.1.1.1:/remote/directory`
