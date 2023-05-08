@@ -11,6 +11,7 @@
 - [**8. Async**](#비동기-프로그래밍)
 - [**9. Feign Client**](#Feign-Client)
 - [**10. 배포파일 원격 전송**](#SCP)
+- [**11. Base64**](#base64)
 
 ----------------
 
@@ -480,3 +481,21 @@
 
 ## GitHub Actions
   - **GitHub Actions**는 GitHub에서 제공하는 서비스로, 빌드, 테스트, 배포 파이프라인을 자동화할 수 있는 <br> `CI(Continuous Integration, 지속 통합)`와 `CD(Continuous Deployment, 지속 배포)` 플랫폼입니다.
+
+
+## Base64
+  - **인코딩**
+    - 인코딩은 정보의 형태나 형식을 표준화, 보안, 처리 속도 향상, 저장 공간 절약 등을 위해서 다른 형태나 형식으로 변환하는 처리 혹은 그 처리 방식을 의미
+    - **BinaryData -> Text = Base64 Encoding**
+  - **Base64란**
+    - **Binary Data**를 **Text**로 바꾸는 Encoding의 하나로써 Binary Data를 Character set에<br> 영향을 받지 않는 공통 ASCII 영역의 문자로만 이루어진 문자열로 바꾸는 Encoding이다
+    - 변경하는 방식은 BinaryData를 6bit씩 자른 뒤 6bit에 해당하는 문자를 Base64색인표에서 찾아 치환한다
+      - Base62는 바이너리 데이터를 문자집합 62개를 기준으로 인코딩/디코딩하는 것을 의미
+
+    <img src = "Image/base64.png">
+    > Base64 색인표
+
+    - **왜 사용하는가?**
+      - Base64 Encoding을 하게되면 전송해야 될 데이터의 양도 33% 증가한다 <br> **6bit당 2bit의 overhead가 발생하기 때문에**
+      - 플랫폼 독립적으로 BinaryData를 전송 할 필요가 있을 때, ASCII로 Encoding하여 전송하게 되면 여러가지 문제가 발생할 수 있다
+      - **따라서, 포함된 BinaryData가 시스템 독립적으로 동일하게 전송 또는 저장되는걸 보장하기 위해 사용한다**
