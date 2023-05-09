@@ -1,0 +1,28 @@
+spring:
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL; #AutoIncrement? ?? ??
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    defer-datasource-initialization: true
+
+logging:
+  level:
+    jwt.tutorial: DEBUG
+
+jwt:
+  header: Authorization
+  secret: c3ByaW5nLXNlY3VyaXR5LXlvb25qdWhvLXN0dWR5LXNwcmluZy1mcmFtZXdvcmstaW4tdW5pdmVyc2l0eS1hYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ei1sb3ZlbWUtaS1oYXRlLXlvdQ==
+  token-validity-in-seconds: 86400
