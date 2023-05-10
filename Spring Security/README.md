@@ -34,6 +34,7 @@
       - 그 후, `Datasource`, `JPA`설정
       - `Entity`를 생성한다
     - `EnableWebSecurity` 어노테이션은 기본적인 `Web`보안을 활성화 하겠다는 의미
+      - 스프링 시큐리티 필터가 스프링 필터체인에 등록이 된다
       - 추가적인 설정을 위해서 `WebSecurityConfigure`를 `implements`하거나 `WebSecurityConfigureAdapter`를 `extends`하는 방법이 있다
       - `WebSecurityConfigureAdapter`가 `deprecated`되어 쓸 수 없게 되어
         ``` java
