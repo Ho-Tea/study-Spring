@@ -1,6 +1,8 @@
 package com.example.security1.config;
 
 
+import com.example.security1.oauth.PrincipalOauth2UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
@@ -17,6 +19,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity  //스프링 시큐리티 필터가 스프링 필터 체인에 등록이 된다
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
+
+    @Autowired
+    private PrincipalOauth2UserService principalOauth2UserService;
 
     @Bean
     public PasswordEncoder encoderPwd(){
@@ -43,8 +48,12 @@ public class SecurityConfig {
                 .successHandler((eq, resp, authentication) -> {
                     System.out.println("디버그 : 로그인이 완료되었습니다");
                     resp.sendRedirect("/");
-                });
-
+                })
+                .and()
+                .oauth2Login()
+                .loginPage("/login")   // 구글 로그인이 완료된 뒤의 후처리가 필요하다
+                .userInfoEndpoint()
+                .userService(principalOauth2UserService);
 
 
         return http.build();

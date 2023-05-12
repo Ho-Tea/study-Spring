@@ -1,13 +1,18 @@
 package com.example.security1.controller;
 
 
+import com.example.security1.auth.PrincipalDetails;
 import com.example.security1.model.User;
 import com.example.security1.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +26,32 @@ public class IndexController {
     private final UserRepository userRepository;
 
     private final PasswordEncoder bCryptPasswordEncoder;
+
+    @GetMapping("/test/login")
+    public @ResponseBody String testLogin(
+            Authentication authentication,
+            @AuthenticationPrincipal PrincipalDetails userDetails
+    ){
+        log.info("/test/login===========");
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        log.info("authentication : " + principalDetails.getUser());
+        log.info("UserDetails : " + userDetails.getUser());
+        return " 새션 정보 확인하기 ";
+    }
+
+    // OAuth
+    @GetMapping("/test/oauth/login")
+    public @ResponseBody String testOAuthLogin(
+            Authentication authentication,
+            @AuthenticationPrincipal OAuth2User oAuth){
+        log.info("/test/oauth/login===========");
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        log.info("authentication : " + oAuth2User.getAttributes());
+        log.info("UserDetails : " + oAuth.getAttributes());
+        return " 새션 정보 확인하기 ";
+    }
+
+
 
 
     @GetMapping("/")
@@ -52,9 +83,9 @@ public class IndexController {
         return "login";
     }
 
-    @GetMapping("/joinForm")
+    @GetMapping("/join")
     public String joinForm(){
-        return "joinForm";
+        return "join";
     }
 
     @PostMapping("/join")
