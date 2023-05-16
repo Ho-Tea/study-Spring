@@ -28,12 +28,87 @@
 
     <img src = "image/filter.png">
 
+    <img src = "image/auth.jpeg">
+
+      - `HeaderWriterFilter` : Request의 Http 해더를 검사하여 header를 추가하거나 빼주는 역할을 한다.
+      - `CorsFilter` : 허가된 사이트나 클라이언트의 요청인지 검사하는 역할을 한다.
+      - `CsrfFilter` : Post나 Put과 같이 리소스를 변경하는 요청의 경우 내가 내보냈던 리소스에서 올라온 요청인지 확인한다.
+      - `LogoutFilter` : Request가 로그아웃하겠다고 하는것인지 체크한다.
+      - `UsernamePasswordAuthenticationFilter` : username / password 로 로그인을 하려고 하는지 체크하여 승인이 되면 Authentication을 부여하고 이동 할 페이지로 이동한다.
+      - `ConcurrentSessionFilter` : 동시 접속을 허용할지 체크한다.
+      - `BearerTokenAuthenticationFilter` : Authorization 해더에 Bearer 토큰을 인증해주는 역할을 한다.
+      - `BasicAuthenticationFilter` : Authorization 해더에 Basic 토큰을 인증해주는 역할을 한다.
+      - `RequestCacheAwareFilter` : request한 내용을 다음에 필요할 수 있어서 Cache에 담아주는 역할을 한다. 다음 Request가 오면 이전의 Cache값을 줄 수 있다.
+      - `SecurityContextHolderAwareRequestFilter` : 보안 관련 Servlet 3 스펙을 지원하기 위한 필터라고 한다.
+      - `RememberMeAuthenticationFilter` : 아직 Authentication 인증이 안된 경우라면 RememberMe 쿠키를 검사해서 인증 처리해준다.
+      - `AnonymousAuthenticationFilter` : 앞선 필터를 통해 인증이 아직도 안되었으면 해당 유저는 익명 사용자라고 Authentication을 정해주는 역할을 한다. (Authentication이 Null인 것을 방지!!)
+      - `SessionManagementFilter` : 서버에서 지정한 세션정책에 맞게 사용자가 사용하고 있는지 검사하는 역할을 한다.
+      - `ExcpetionTranslationFilter` : 해당 필터 이후에 인증이나 권한 예외가 발생하면 해당 필터가 처리를 해준다.
+      - `FilterSecurityInterceptor` : 사용자가 요청한 request에 들어가고 결과를 리턴해도 되는 권한(Authorization)이 있는지를 체크한다.<br> 해당 필터에서 권한이 없다는 결과가 나온다면 위의 ExcpetionTranslationFilter필터에서 Exception을 처리해준다.
+
+
+    <img src = "image/user.png">
+
   - 클라이언트가 서버에 데이터를 요청하면 `DispatcherServlet`에 전달되기 이전에 여러 `ServletFilter`를 거친다
   - 이때, Spring Security에 등록했었던 `Filter`를 이용해 사용자 보안 관련된 처리를 진행하는데<br> 연결된 여러개의 Filter들로 구성 되어 있어서 `FilterChain`이라고 부른다
-    - `@Configuration` : 해당 클래스를 Configuration으로 등록한다
+    - `@Configuration` : 해당 클래스를 Configuration으로 등록한다!
+      <img src = "image/filter.png">
+
     - `@EnableWebSecurity` : Spring Security를 활성화 시킨다
     - `@EnableGlobalMethodSecurity(prePostEnabled = true)` : Controller에서 특정 페이지에 특정 권한이 있는 유저만 접근을 허용할 경우 <br> `@PreAuthorize` 어노테이션을 사용하는데, 해당 어노테이션에 대한 설정을 활성화시키는 어노테이션
       - 이것또한 `Deprecated`되어 `@EnableMethodSecurity` 추가, `@PreAuthorize` 어노테이션을 메서드 단위로 추가하기 위해서 사용
+    - `@AuthenticationPrincipal`: 스프링 시큐리티의 `AuthenticationPrincipalArgumentResolver` 클래스를 활용하여 `SecurityContextHolder`에 접근해서 값을 돌려준다.
+      - `@AuthenticationPrincipal`를 쓰면 쉽게 `UserDetails`를 구현하여 만든 `Principal` 인스턴스를 얻을 수 있었다
+
+
+- ### 인증 아키텍쳐
+
+  <img src = "image/arch.png">
+
+  > AuthenticationFilter에 의해 AuthenticationManager가 동작한다.
+  <br> 인증을 처리하면 SecurityContextHolder에 Authentication 값이 세팅된다.
+  - `(1)` 사용자의 요청
+    - `UsernamePasswordAuthenticationFilter` : username / password 로 로그인을 하려고 하는지 체크하여 승인이 되면 `Authentication`을 부여하고 이동 할 페이지로 이동한다.
+  - `(2)` 사용자 자격 증명을 기반으로 AuthenticationToken 생성
+  - `(3)` 만들어진 토큰을 AuthenticationManager 로 전달
+  - `(4)` AuthenticationProvider(들) 목록으로 인증을 시도합니다
+  - `(5)(6)(7)` 일부 AuthenticationProvider는 사용자 이름을 기반으로 사용자 세부 정보를 검색하기 위해 `UserDetailsService`를 사용할 수 있습니다.
+  - `(8)` 인증에 성공 시 인증 객체를 반환하며 그렇지 않았을 경우 Authentication 예외를 발생시킵니다.
+  - `(9)` 획득한 인증된 객체를 AuthenticationManager가 인증필터를 통해 다시 반환합니다.
+  - `(10)` AuthenticationFilter는 향후 필터 사용을 위해 얻은 인증 개체를 SecurityContext에 저장합니다.
+  
+
+  - **Authentication**
+    - <img src = "image/authentication.png">
+    >  Authentication은 사이트에서 "통행증" 역할을 한다. Authentication을 구현하는 객체들은 대체로 메서드 이름 맨 뒤에 AuthenticationToken이 붙는다. 그래서 구현체들을 인증토큰이라고 부른다. 
+
+    - `Credentials` : 인증을 위해 필요한 정보(input, 비밀번호)
+    - `Principal` : 인증된 결과, 인증대상(output)
+    - `Details` : 기타 정보, 인증 관련 주변 정보들(ip, session 관련)
+    - `Authorities` : 권한 정보들
+    - (권한을 담당하는 GrantedAuthority를 구현한 객체들을 Authorities에 넣어둔다. )
+    > Authentication 객체는 SecurityContextHolder를 통해 세션이 있건 없건 언제든 접근할 수 있도록 필터체인에서 보장해준다.
+    - Authentication에는 인증 결과를 저장할 뿐만 아니라, 인증을 위한 정보도 들어있다.
+      - **왜냐하면, 인증 제공자(AuthenticationProvider)에게 Authentication이 넘겨져 인증 절차를 거쳐야 하기 때문이다.**
+      - AuthenticationProvider는 인증을 검사 할 Authentication대상을 알려주는 supports()를 지원한다. 
+      - supports()에 자신이 담당하는 인증토큰 방식을 정의하여 내가 담당한 인증토큰을 찾는다.<br> authenticate()에서는 Authentication을 입력값과 출력값으로 사용하여 검증한다.
+  
+  - **Authentication Provdier**
+    - <img src = "image/provider.png">
+    > 인증 제공자(AuthenticationProvider)는 supports()로 자신이 인증 검사 할 인증 토큰을 정한다. 실제 검증 시에는, Authentication을 받아서 credentials을 검증하고 Principal Authentication을 리턴한다. 
+
+    > input, output 모두 Authentication인데 일반적으로 인증을 위해 input되는 것은 credentials이고 인증 후 output 되는 것은 Principal이다. (혹은 input으로 Principal이 들어올 수도 있으며 확인하고 리턴한다.)
+    
+    - 인증 제공자는 어떤 인증을 확인할지 인증 관리자(AuthenticationManager)에게 알려줘야 한다. <br> supports() 메서드로 검사한다. 인증 대상과 방식이 다양할 수 있기 때문에 인증 제공자도 여러개 존재한다.
+
+  - **Authentication Manager**
+    - <img src = "image/manager.png">
+    - 인증 제공자를 관리하는 인터페이스가 인증관리자(AuthenticationManger) 인터페이스이고, 인증관리자를 구현한 객체가 `ProviderManager`이다. ( 복수개 존재 가능 )
+    - **개발자가 인증관리자(AuthenticationManager)를 직접 구현하지 않는다면,**<br> AuthenticationManager를 만드는 AuthenticationManagerFactoryBean에서 DaoAuthenticationProvider를 기본 인증제공자로 등록하여 AuthenticationManager를 만든다.
+    - **DaoAuthenticationProvider는 반드시 1개의 UserDetailsService를 가져야 한다.** <br> 만약 없으면 InmemoryUserDetailsManager에 [username = user, password=(서버가 생성한 패스워드)]인 사용자가 제공된다.
+    - **일반적으로 실무에서 AuthenticationManager를 직접 정의하는 경우는 없다.** <br> **UserDetails를 구현한 객체를 만들고 UserDeatilsService에 제공하면 DaoAuthenticationProvider가 인증 제공자에 위임해서 처리하기 때문이다.**
+
+------------
 
 
 - ### JWT (Json Web Token)
@@ -700,3 +775,17 @@
     - 이 이유는 `rest api`를 이용한 서버라면, `session` 기반 인증과는 다르게 `stateless`하기 때문에 서버에 인증정보를 보관하지 않는다. 
     - `rest api`에서 `client`는 권한이 필요한 요청을 하기 위해서는 요청에 필요한 인증 정보를(`OAuth2`, `jwt토큰` 등)을 포함시켜야 한다. 
     - 따라서 서버에 인증정보를 저장하지 않기 때문에 굳이 불필요한 `csrf` 코드들을 작성할 필요가 없다.
+
+- ### 세션 vs JWT
+  - **세션**
+    - 유저네임, 패스워드 로그인 정상
+    - 서버쪽 세션 ID생성
+    - 클라이언트 쿠키 세션 ID를 응답
+    - 요청할 때 마다 쿠키값 세션 ID를 항상 들고 서버쪽으로 요청하기 때문에 <br> 서버는 세션 ID가 유효한지 판단해서 유효하면 인증이 필요한 페이지로 접근하게 하면 된다
+
+  - **JWT**
+    - 유저네임, 패스워드 로그인 정상
+    - JWT토큰을 생성
+    - 클라이언트 쪽으로 JWT토큰을 응답
+    - 요청할 때 마다 JWT토큰을 가지고 요청
+    - 서버는 JWT토큰이 유효한지를 판단(필터가 따로 없어서 필터를 만들어야 한다)
