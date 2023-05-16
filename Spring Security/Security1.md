@@ -1,4 +1,18 @@
 ## Spring Security 1  - Session
+  - <img src = "image/session1.png">
+
+    - <img src = "image/session2.png">
+    - `서버2`에서 인증처리가 된 후, `로드밸런싱`이 되어 `서버1`로 요청을 해야하는 상황에서는<br> 처음 들어온 `client`라고 인식한다
+    - 자바스크립트 딴에서 헤더의 쿠키를 조작할 수 있으므로 보안에 취약하다
+    - **해결법**
+      - 처음 들어간 서버랑만 계속 Mapping시킨다
+      - 세션을 서버끼리 복제해서 유지한다
+      - 세션을 DB에 저장후 공유한다
+        - `I/O 오버헤드` 발생
+        - **메모리 공유 서버(Redis)를 만들어 I/O를 없애는 방법으로 해결**
+
+    
+
   - **Setting**
     - `Spring Boot DevTools`
     - `Lombok`
