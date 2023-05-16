@@ -1,11 +1,28 @@
 ## Spring Security
+
+  - **OSI 7계층**
+    - **WAN**
+      - 응용계층  -> 프로그램
+      - 프레젠테이션 계층 -> 암호화, 압축
+      - 세션 계층 -> 인증체크
+      - 트랜스포트 계층 -> TCP, UDP
+      - 네트워크 계층 -> IP
+    - **LAN**
+      - 데이터링크 계층 -> LAN
+      - 물리계층
+        <img src = "image/osi.png">
+
+  - **RSA**
+    - <img src = "image/rsa.png">
+
   - **JWT**
+    - <img src = "image/2.png">
 
 - ### Spring Security
   - 스프링 시큐리티는 스프링 기반 애플리케이션의 **인증**과 **권한**을 담당하는 스프링의 하위 프레임워크이다.
-  - **인증(Authenticate)**은 로그인을 의미한다.
-  - **권한(Authorize)**은 인증된 사용자가 어떤 것을 할 수 있는지를 의미한다.
-  - **FilterChainProxy**라는 이름으로 내부에 여러 `Filter`들이 동작하고 있다
+  - **인증(Authenticate)** 은 로그인을 의미한다.
+  - **권한(Authorize)** 은 인증된 사용자가 어떤 것을 할 수 있는지를 의미한다.
+  - **FilterChainProxy** 라는 이름으로 내부에 여러 `Filter`들이 동작하고 있다
   - Spring Security는 `Filter`를 이용해서 기본적인 기능을 간단하게 구현할 수 있다
   - 설정은 `WebSecurityConfigurerAdapter` 클래스를 상속받아 오버라이딩하는 방식으로 진행가능하다<br> 하지만, `Deprecated`되어 `SecurityFilterChain`을 리턴하는 메서드 이용
 
@@ -19,7 +36,7 @@
       - 이것또한 `Deprecated`되어 `@EnableMethodSecurity` 추가, `@PreAuthorize` 어노테이션을 메서드 단위로 추가하기 위해서 사용
 
 
-- ### JWT
+- ### JWT (Json Web Token)
   - JSON객체를 사용해서 토큰 자체에 정보들을 저장하고 있는 `Web Token`이라고 정의
   - 장점
     - 중앙의 인증서버, 데이터 스토어에 대한 의존성 없다, 시스템 수평 확장에 유리
@@ -347,6 +364,8 @@
         http
                 .csrf().disable()
                 // 우리는 토큰을 사용하기 때문에 csrf설정은 disable
+                // Authorization에 토큰을 넣어서 요청한다 -> Bearer 방식
+                // Authorization에 ID, PW를 넣어서 요청한다 -> Http Basic 방식
 
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -362,6 +381,12 @@
                 //                .headers()
                 //                .addHeaderWriter(new XFrameOptionsHeaderWriter(
                 //                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)) 와 같은 역할
+
+                //.and()
+                //.addFilter(corsFilter)  // @CrossOrigin은 인증이 필요없는 경우만, 인증이 필요한 경우는 시큐리티 필터에 등록해야한다
+                //.formLogin().disable()
+                //.httpBasic().disable()  // Http Header의 Authorization에 ID, PW를 넣어서 보낸다 (매 요청마다) -> ID, PW 암호화 안되어 보안에 취약(HTTPS를 쓰면 암호화가 되기는 한다)
+
 
                 .and()
                 .sessionManagement()
@@ -587,6 +612,91 @@
 
       ```
 
+- ### Filter 등록 
+  ``` java 
+  public class MyFilter1 implements Filter {
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        chain.doFilter(request, response);
+        // 토큰(ex:cos)을 만들어주어야 한다. id,pw가 정상적으로 들어와서 로그인이 완료되면 토큰을 만들어주고 그걸 응답을 해준다
+        // 요청할 때 마다 header에 Authorization에 vale값으로 토큰을 가지고 온다
+        // 그 때 토큰이 넘어오면 이 토큰이 내가 만든 토큰이 맞는지만 검증하면 된다(RSA, HS256)
+    }
+  }
 
 
-   
+
+  //Security Config
+   http
+                .addFilterBefore(new MyFilter1(), BasicAuthenticationFilter.class)  //spring filter chain에 내 filter를 등록하는 과정
+
+  ```
+  > Filter 등록하는 방법 1
+
+  ``` java
+  @Configuration
+  public class FilterConfig {
+    @Bean
+    public FilterRegistrationBean<MyFilter1> filter1(){
+        FilterRegistrationBean<MyFilter1> bean = new FilterRegistrationBean<>(new MyFilter1());
+        bean.addUrlPatterns("/**");
+        bean.setOrder(0); // 낮은 번호가 필터중에서 가장 먼저 실행됨
+        return bean;
+    }
+  }
+  ```
+  > Filter 등록하는 방법 2(방법 1보다 우선순위가 낮다)
+
+
+- ### CORS
+  - **CORS란?(교차 출처 자원 공유 방식)**
+    - 예) 주소가 '어쩌구'닷컴인 웹사이트에서 URL이 '저쩌구'닷컴인 서비스에 API로 정보를 받아오기 위해 <br> '프론트'에서 HTTP요청을 보냈을 때 미리 어떤 설정을 해주지 않으면 `CORS`문제로 막히게 된다
+    - 브라우저에서는 보안적인 이유로 `cross-origin` HTTP 요청들을 제한한다.
+    - 그래서 `cross-origin` 요청을 하려면 서버의 동의가 필요.
+    - 만약 서버가 동의한다면 브라우저에서는 요청을 허락하고, 동의하지 않는다면 브라우저에서 거절한다
+    - 이러한 허락을 구하고 거절하는 메커니즘을 `HTTP-header`를 이용해서 가능한데,<br> **이를 CORS(Cross-Origin Resource Sharing)라고 부릅니다.**
+      - 그래서 브라우저에서 `cross-origin` 요청을 안전하게 할 수 있도록 하는 메커니즘
+
+  - **origin이란**
+    - 오리진과 비슷한 개념으로는 `도메인(domain)`이 있다
+    - **도메인(domain)** : `naver.com`
+    - **오리진(origin)**: `https://www.naver.com/PORT`
+    - 이와 같이 도메인과 오리진의 차이는 프로토콜과 포트번호의 포함 여부이다.
+
+  - **cross-origin이란**
+    <img src = "image/cors2.png">
+    - `cross-origin`이란 다음 중 한 가지라도 다른 경우를 말한다
+    - **프로토콜** - http와 https는 프로토콜이 다르다.
+    - **도메인** - domain.com과 other-domain.com은 다르다.
+    - **포트 번호** - 8080포트와 3000포트는 다르다.
+
+
+  - **Simple requests**인 경우(서버 데이터에 영향 X)
+    - `GET`, `HEAD`, `POST`
+    1. 서버로 요청을 한다
+    2. 서버의 응답이 왔을 때 브라우저가 요청한 `Origin`과 응답한 헤더 `Access-Control-Request-Headers`의 값을 비교하여<br> 유효한 요청이라면 리소스를 응답합니다. 만약 유효하지 않은 요청이라면 브라우저에서 이를 막고 **에러**가 발생합니다.
+    - **예)**
+      - 미친토끼 닷컴에서 네이버 지도 API로 요청을 보낸다, 다른 출처로의 요청이니까 `cross-origin` 요청이다
+      - 브라우저는 이처럼 다른 출처끼리의 요청이 보내질 때는 요청에 `Origin`이라는 `header`를 추가한다 
+        - `Origin`내부에는 요청하는 쪽의 `scheme`과 `domain`, `port`가 담긴다
+
+      - 이 요청을 받은 네이버 지도 API서버는 답장의 헤더에 지정된 `Access-Control-Allow-Origin`정보를 실어서 보낸다
+        - 만약 미친토끼닷컴이 등록된 상태면 그 URL도 들어있다
+
+  - **preflight 요청인 경우** (서버 데이터에 영향 O)
+    - `Simple requests`가 아닌 `cross-origin`요청은 모두 `preflight` 요청을 하게 되는데, <br> 실제 요청을 보내는 것이 안전한지 확인하기 위해 먼저 `OPTIONS` 메서드를 사용하여 `cross-origin` `HTTP` 요청을 보냅니다.<br> 이렇게 하는 이유는 사용자 데이터에 영향을 미칠 수 있는 요청이므로 사전에 확인 후 본 요청을 보냅니다.
+    1. `Origin`헤더에 현재 요청하는 `origin`과, `Access-Control-Request-Method`헤더에 요청하는 `HTTP method`와 `Access-Control-Request-Headers`요청 시<br> 사용할 헤더를 `OPTIONS` 메서드로 서버로 요청합니다. 이때 내용물은 없이 헤더만 전송합니다.
+    2. 브라우저가 서버에서 응답한 헤더를 보고 유효한 요청인지 확인합니다.<br> 만약 유효하지 않은 요청이라면 요청은 중단되고 에러가 발생합니다. <br> 만약 유효한 요청이라면 원래 요청으로 보내려던 요청을 다시 요청하여 리소스를 응답받습니다.
+    - <img src = "image/cors.png">
+
+- ### CSRF
+  - 사이트간 위조 요청 - (정상적인 사용자가 의도치 않은 위조요청을 보내는 것)
+  - `CSRF protection`은 `spring security`에서 `default`로 설정된다. 
+  - 즉, `protection`을 통해 `GET`요청을 제외한 상태를 변화시킬 수 있는 `POST`, `PUT`, `DELETE` 요청으로부터 보호한다.
+  - `csrf protection`을 적용하였을 때, `html`에서 다음과 같은 `csrf` 토큰이 포함되어야 요청을 받아들이게 됨으로써, 위조 요청을 방지하게 됩니다.
+  - `<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>`
+  - **왜 disable할까?**
+    - `spring security documentation`에 `non-browser clients` 만을 위한 서비스라면 `csrf`를 `disable` 하여도 좋다고 한다.
+    - 이 이유는 `rest api`를 이용한 서버라면, `session` 기반 인증과는 다르게 `stateless`하기 때문에 서버에 인증정보를 보관하지 않는다. 
+    - `rest api`에서 `client`는 권한이 필요한 요청을 하기 위해서는 요청에 필요한 인증 정보를(`OAuth2`, `jwt토큰` 등)을 포함시켜야 한다. 
+    - 따라서 서버에 인증정보를 저장하지 않기 때문에 굳이 불필요한 `csrf` 코드들을 작성할 필요가 없다.
