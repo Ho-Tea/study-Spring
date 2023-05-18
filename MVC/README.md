@@ -1,5 +1,22 @@
-## 스프링 웹 MVC
-- ### Init
+# 스프링 웹 MVC
+
+## 목차
+- [**Init(배경지식)**](#init(배경지식))
+- [**HttpServlet**](#서블릿)
+- [**Servlet으로 회원 관리 웹 애플리케이션 만들기**](#서블릿으로-회원-관리-웹-애플리케이션-만들기)
+- [**MVC 프레임워크 만들기**](#MVC-프레임워크-만들기)
+- [**MVC 구조 이해**](#MVC-구조-이해)
+- [**스프링 MVC 기본기능**](#스프링-MVC-기본기능)
+- [**Thymeleaf**](#thymeleaf)
+- [**PRG**](#prg)
+
+
+
+
+-----------
+
+
+- ## Init(배경지식)
   - **웹 서버**
     - 웹서버는 HTTP기반으로 동작
     - 정적 리소스 제공, 기타 부가기능
@@ -55,8 +72,6 @@
           - 개발자는 Response 객체에 HTTP응답 정보를 편리하게 입력
           - WAS는 Response 객체에 담겨있는 내용으로 HTTP응답 정보를 생성
 
-
----------------
 
   - **서블릿 컨테이너**
     - **톰캣**처럼 서블릿을 지원하는 WAS를 서블릿 컨테이너라고 한다
@@ -134,7 +149,7 @@
 
 -------------
 
-- ### 서블릿
+- ## 서블릿
   - 스프링 부트는 서블릿을 직접 등록해서 사용할 수 있도록 `@ServletComponentScan`을 지원한다(**main 메서드를 호출하는 메인클래스 애노테이션에 추가**)
 
   ``` java
@@ -154,10 +169,6 @@
   - HTTP요청을 통해 매핑된 URL이 호출되면서 서블릿 컨테이너는 다음 메서드를 실행한다<br>
   `protected void service(HttpServletRequest request, HttpServletResponse response)`
     - Was서버들이 위 HttpServlet..표준스펙을 구현한다
-
-
--------------
-
 
 
   - **HttpServletRequest**
@@ -217,8 +228,6 @@
 
         - JSON결과를 파싱해서 사용 할 수 있는 자바 객체로 변환하려면 `Jackson, Gson`과 같은 JSON변환 라이브러리를 추가해서 사용해야 한다.<br> 스프링 부트로 Spring MVC 를 선택하면 기본으로 `Jackson라이브러리`(ObjectMapper)를 함께 제공한다
 
-
--------------
   - **HttpServletResponse**
     - HTTP응답 메시지 생성
       - HTTP응답 코드 지정, 헤더 생성, 바디 생성
@@ -257,7 +266,7 @@
 
 
 
-- ### 서블릿으로 회원 관리 웹 애플리케이션 만들기
+- ## 서블릿으로 회원 관리 웹 애플리케이션 만들기
   - 서블릿으로 회원 등록 폼 HTML 폼 제공
     ``` java 
     response.setContentType("text/html");
@@ -308,7 +317,7 @@
 
 ------------------------
 
-- ### MVC 프레임워크 만들기
+- ## MVC 프레임워크 만들기
 
   - <img src = "image/front.png">
 
@@ -324,7 +333,7 @@
 
 ------------------------
 
-- ### MVC 구조 이해
+- ## MVC 구조 이해
   - 직접만든 프레임워크와 스프링 MVC 비교
     - FrontController -> `DispatcherServlet`
     - handlerMappingMap -> `HandlerMapping`
@@ -483,7 +492,7 @@
 
 ----------------------
 
-- ### 스프링 MVC 기본기능
+- ## 스프링 MVC 기본기능
   - **로깅**
     - 운영시스템에서는 `System.out.println()`같은 시스템 콘솔을 사용해서 필요한 정보를 출력하지 않고, <br> 별도의 로깅 라이브러리를 사용해서 로그를 출력한다
     - 스프링 부트 라이브러리를 사용하면 스프링 부트 로깅 라이브러리(`spring-boot-starter-logging`)가 포함된다
@@ -644,7 +653,7 @@
 
   
 
-- ### Thymeleaf
+- ## Thymeleaf
   - 타임리프 사용 선언
     - `<html xmlns:th="http://www.thymeleaf.org">`
   - 속성변경
@@ -658,9 +667,11 @@
     - `@{...}`
   - 변수 표현식 -> ${...}
 
+-----------
 
 
-  - ### PRG
+
+- ## PRG
     - <img src ="image/prg.png">
     
     - 웹 브라우저의 새로고침은 마지막에 서버에 전송한 데이터를 다시 전송한다
