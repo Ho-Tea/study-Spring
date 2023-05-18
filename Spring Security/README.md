@@ -1,5 +1,37 @@
-## Spring Security
+# Spring Security
 
+## 목차
+  - ### [Session](https://github.com/Ho-Tea/study-Spring/blob/main/Spring%20Security/Security1.md)
+  - ### [OAuth](https://github.com/Ho-Tea/study-Spring/blob/main/Spring%20Security/Security2.md)
+  - ### Spring Security
+    - [**Init(배경지식)**](#init(배경지식))
+    - [**Spring Security 개념**](#Spring-Security-개념)
+    - [**인증 아키텍쳐**](#인증-아키텍쳐)
+      - [**Authentication**](#authentication)
+      - [**Authentication Provdier**](#authentication-provdier)
+      - [**Authentication Manager**](#authentication-manager)
+
+    - [**JWT**](#jwt-(json-web-token))
+
+      - [**WebSecurity vs HttpSecurity**](#`websecurity-vs-httpsecurity`)
+      - [**JWT 관련 코드 개발**](#jwt-관련-코드-개발)
+      - [**JWT Custom Filter**](#jwt-custom-filter-생성)
+      - [**JWT Security Config 생성**](#jwt-security-config-생성)
+      - [**Exception 관련 핸들러**](#exception-관련-핸들러-추가)
+      - [**SecurityConfig**](#securityConfig에-추가)
+      - [**회원가입 API생성**](#회원가입-api생성)
+      - [**Filter 등록**](#filter-등록-)
+
+    - [**CORS**](#cors)
+    - [**CSRF**](#csrf)
+    - [**세션 vs JWT**](#세션-vs-jwt)
+      
+
+
+
+-------------------------
+
+## Init(배경지식)
   - **OSI 7계층**
     - **WAN**
       - 응용계층  -> 프로그램
@@ -18,7 +50,12 @@
   - **JWT**
     - <img src = "image/2.png">
 
-- ### Spring Security
+
+------------------
+
+
+
+## Spring Security 개념
   - 스프링 시큐리티는 스프링 기반 애플리케이션의 **인증**과 **권한**을 담당하는 스프링의 하위 프레임워크이다.
   - **인증(Authenticate)** 은 로그인을 의미한다.
   - **권한(Authorize)** 은 인증된 사용자가 어떤 것을 할 수 있는지를 의미한다.
@@ -60,8 +97,10 @@
     - `@AuthenticationPrincipal`: 스프링 시큐리티의 `AuthenticationPrincipalArgumentResolver` 클래스를 활용하여 `SecurityContextHolder`에 접근해서 값을 돌려준다.
       - `@AuthenticationPrincipal`를 쓰면 쉽게 `UserDetails`를 구현하여 만든 `Principal` 인스턴스를 얻을 수 있었다
 
+---------
 
-- ### 인증 아키텍쳐
+
+## 인증 아키텍쳐
 
   <img src = "image/arch.png">
 
@@ -78,7 +117,7 @@
   - `(10)` AuthenticationFilter는 향후 필터 사용을 위해 얻은 인증 개체를 SecurityContext에 저장합니다.
   
 
-  - **Authentication**
+  - ### Authentication
     - <img src = "image/authentication.png">
     >  Authentication은 사이트에서 "통행증" 역할을 한다. Authentication을 구현하는 객체들은 대체로 메서드 이름 맨 뒤에 AuthenticationToken이 붙는다. 그래서 구현체들을 인증토큰이라고 부른다. 
 
@@ -93,7 +132,7 @@
       - AuthenticationProvider는 인증을 검사 할 Authentication대상을 알려주는 supports()를 지원한다. 
       - supports()에 자신이 담당하는 인증토큰 방식을 정의하여 내가 담당한 인증토큰을 찾는다.<br> authenticate()에서는 Authentication을 입력값과 출력값으로 사용하여 검증한다.
   
-  - **Authentication Provdier**
+  - ### Authentication Provdier
     - <img src = "image/provider.png">
     > 인증 제공자(AuthenticationProvider)는 supports()로 자신이 인증 검사 할 인증 토큰을 정한다. 실제 검증 시에는, Authentication을 받아서 credentials을 검증하고 Principal Authentication을 리턴한다. 
 
@@ -101,7 +140,7 @@
     
     - 인증 제공자는 어떤 인증을 확인할지 인증 관리자(AuthenticationManager)에게 알려줘야 한다. <br> supports() 메서드로 검사한다. 인증 대상과 방식이 다양할 수 있기 때문에 인증 제공자도 여러개 존재한다.
 
-  - **Authentication Manager**
+  - ### Authentication Manager
     - <img src = "image/manager.png">
     - 인증 제공자를 관리하는 인터페이스가 인증관리자(AuthenticationManger) 인터페이스이고, 인증관리자를 구현한 객체가 `ProviderManager`이다. ( 복수개 존재 가능 )
     - **개발자가 인증관리자(AuthenticationManager)를 직접 구현하지 않는다면,**<br> AuthenticationManager를 만드는 AuthenticationManagerFactoryBean에서 DaoAuthenticationProvider를 기본 인증제공자로 등록하여 AuthenticationManager를 만든다.
@@ -111,7 +150,7 @@
 ------------
 
 
-- ### JWT (Json Web Token)
+## JWT (Json Web Token)
   - JSON객체를 사용해서 토큰 자체에 정보들을 저장하고 있는 `Web Token`이라고 정의
   - 장점
     - 중앙의 인증서버, 데이터 스토어에 대한 의존성 없다, 시스템 수평 확장에 유리
@@ -159,7 +198,7 @@
             }
         }
         ```
-  - `WebSecurity vs HttpSecurity`
+  - ### `WebSecurity vs HttpSecurity`
     - `SpringBuilder`는 웹 보안을 구성하는 빌더 클래스로서 웹 보안을 구성하는 빈 객체와 설정 클래스들을 생성하는 역할을 한다.
     - 이 빌더의 종류로는 **HttpSecurity**와 **WebSecurity**가 있다.
     - `WebSecurity`는 `HttpSecurity`의 상위에 있다. `WebSecurity`의 ignoring에 endpoint를 만들면, Security Filter Chain이 적용되지 않는다.
@@ -226,7 +265,7 @@
       - 위 처럼 URL 요청시 `X-Frame-Options` 헤더값을 `sameorigin`으로 설정하여 오류가 발생하지 않도록 했다. 
       - `X-Frame-Options` 헤더의 값으로 `sameorigin`을 설정하면 `frame`에 포함된 페이지가 페이지를 제공하는 사이트와 동일한 경우에는 계속 사용할 수 있다.
 
-  - **JWT 관련 코드 개발**
+  - ### JWT 관련 코드 개발
     - `application.yml`파일 JWT 
       - 이 튜토리얼에서는 `HS512`알고리즘을 사용하기 때문에 `Secret key`는 `64Byte` 이상이 되어야 한다
         ``` groovy
@@ -316,7 +355,7 @@
       }
       ```
 
-    - **JWT Custom Filter** 생성
+    - ### JWT Custom Filter 생성
       ``` java
 
       // JWT를 위한 커스텀 필터를 만들기 위해 JWTFilter 클래스 생성
@@ -358,7 +397,7 @@
       }
       ```
 
-    - **JWT Security Config** 생성
+    - ### JWT Security Config 생성
       ``` java
       // TokenProvider, JwtFilter 를 SecurityConfig에 적용할 때 사용할 JwtSecurityConfig클래스 추가
       public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
@@ -376,7 +415,7 @@
       }
 
       ```
-    - **Exception 관련 핸들러 추가**
+    - ### Exception 관련 핸들러 추가
       - `JwtAuthenticationEntryPoint`
         ``` java
         // 유효한 자격증명을 제공하지 않고 접근하려 할 때 401 Unauthorized 에러를 리턴할 JwtAuthenticationEntryPoint 클래스
@@ -401,7 +440,7 @@
         }
         ```
 
-    - **SecurityConfig**에 추가
+    - ### SecurityConfig에 추가
       ``` java
       @EnableWebSecurity
       @Configuration
@@ -572,7 +611,8 @@
       }
 
       ```
-  - **회원가입 API생성**
+
+  - ### 회원가입 API생성
     - **Controller**
       - **UserController**
         ``` java
@@ -687,6 +727,9 @@
 
       ```
 
+--------------------
+
+
 - ### Filter 등록 
   ``` java 
   public class MyFilter1 implements Filter {
@@ -721,6 +764,9 @@
   }
   ```
   > Filter 등록하는 방법 2(방법 1보다 우선순위가 낮다)
+
+--------------
+
 
 
 - ### CORS
@@ -764,6 +810,10 @@
     2. 브라우저가 서버에서 응답한 헤더를 보고 유효한 요청인지 확인합니다.<br> 만약 유효하지 않은 요청이라면 요청은 중단되고 에러가 발생합니다. <br> 만약 유효한 요청이라면 원래 요청으로 보내려던 요청을 다시 요청하여 리소스를 응답받습니다.
     - <img src = "image/cors.png">
 
+--------------
+
+
+
 - ### CSRF
   - 사이트간 위조 요청 - (정상적인 사용자가 의도치 않은 위조요청을 보내는 것)
   - `CSRF protection`은 `spring security`에서 `default`로 설정된다. 
@@ -775,6 +825,10 @@
     - 이 이유는 `rest api`를 이용한 서버라면, `session` 기반 인증과는 다르게 `stateless`하기 때문에 서버에 인증정보를 보관하지 않는다. 
     - `rest api`에서 `client`는 권한이 필요한 요청을 하기 위해서는 요청에 필요한 인증 정보를(`OAuth2`, `jwt토큰` 등)을 포함시켜야 한다. 
     - 따라서 서버에 인증정보를 저장하지 않기 때문에 굳이 불필요한 `csrf` 코드들을 작성할 필요가 없다.
+
+
+-------------
+
 
 - ### 세션 vs JWT
   - **세션**
