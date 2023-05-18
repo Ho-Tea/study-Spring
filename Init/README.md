@@ -1,17 +1,26 @@
-# 💡 헷갈려하는 정의나 개념을 정리하는 곳
+# 💡 헷갈려하는 정의나 개념을 정리하는 공간
 
 
-- [**1. 서블릿**](#Servlet)
-- [**2. 서블릿 컨테이너**](#Servlet-Container)
-- [**3. Was VS ServletContainer**](#Was-vs-Servlet-Container)
-- [**4. Web.xml이 사라진 이유**](#Web.xml)
-- [**5. Ant**](#ANT)
-- [**6. MultiModule**](#Multi-Module)
-- [**7. Spring Profile**](#Profile)
-- [**8. Async**](#비동기-프로그래밍)
-- [**9. Feign Client**](#Feign-Client)
-- [**10. 배포파일 원격 전송**](#SCP)
-- [**11. Base64**](#base64)
+## 목차
+- [**서블릿**](#servlet)
+- [**CGI**](#cgi)
+- [**서블릿 컨테이너**](#servlet-container)
+- [**Spring MVC**](#spring-mvc)
+- [**JSP**](#jsp)
+- [**Was VS ServletContainer**](#was-vs-servlet-container)
+- [**JDBC**](#jdbc)
+- [**Web.xml**](#web.xml)
+- [**Web.xml이 사라진 이유**](#servlet/spring-에서-web.xml은-어떻게-사라졌을까?)
+- [**빌드 도구 종류와 차이점**](#빌드-도구-종류와-차이점)
+- [**Ant**](#ant)
+- [**Git Flow**](#git-flow)
+- [**MultiModule**](#multi-module)
+- [**Spring Profile**](#profile)
+- [**Async**](#비동기-프로그래밍)
+- [**Feign Client**](#feign-client)
+- [**배포파일 원격 전송 & AWS**](#scp)
+- [**Apache Commons Lang 3**](#apache-commons-lang-3)
+- [**Base64**](#base64)
 
 ----------------
 
@@ -27,7 +36,7 @@
   - 서블릿 컨테이너 : 서블릿의 생성, 실행 그리고 소멸 등 LifeCycle을 관리하는 CGI프로그램
   - 서블릿 : **Servlet 인터페이스를 구현한 프로그램으로 서버측 프로그램이다**
 
-- ### Servlet(자바로 구현된 CGI)
+  - ### Servlet(=자바로 구현된 CGI)
   - 클라이언트가 어떠한 요청을 하면 그에 대한 결과를 다시 전송해주어야 하는데, <br> 이러한 역할을 하는 자바 프로그램
   - 자바에서 웹 애플리케이션을 만드는 기술(서블릿은 여러개)
   - 자바에서 동적인 웹페이지를 구현하기 위한 표준
@@ -35,15 +44,15 @@
 
     <img src = "Image/servlet3.png">
 
-- ### CGI
+## CGI
   - 웹서버와 애플리케이션 사이에 데이터를 주고받는 규약
   - 프로그램 종류로는 컴파일방식(C, C++, java)과 인터프리터 방식(php, python)방식이 존재한다
   - <img src = "Image/servlet.png">
   - <img src = "Image/servlet2.png">
+  - **우리는 cgi규칙을 몰라도 된다**  
+  - **웹서버와 cgi규칙으로 데이터를 주고받는 스크립트 엔진, 서블릿 컨테이너**
 
-**우리는 cgi규칙을 몰라도 된다**  
 
-**웹서버와 cgi규칙으로 데이터를 주고받는 스크립트 엔진, 서블릿 컨테이너**
 
 ## Servlet Container
   - 서블릿의 생성부터 소멸까지의 라이프 사이클을 관리하는 역할
@@ -61,8 +70,8 @@
 
     <img src = "Image/서블릿.png">
 
-  - Spring MVC
-    - Spring MVC는 spring에서 제공하는 웹 모듈로 Model, View, Controller 세가지 구성요소를 사용해 <br> 사용자의 다양한 HTTP Request를 처리하고 단순한 텍스트 형식의 응답부터 REST형식의 응답은 물론 <br> View를 표시하는 html을 return하는 응답까지 다양한 응답을 할 수 있도록 하는 프레임 워크
+## Spring MVC
+  - Spring MVC는 spring에서 제공하는 웹 모듈로 Model, View, Controller 세가지 구성요소를 사용해 <br> 사용자의 다양한 HTTP Request를 처리하고 단순한 텍스트 형식의 응답부터 REST형식의 응답은 물론 <br> View를 표시하는 html을 return하는 응답까지 다양한 응답을 할 수 있도록 하는 프레임 워크
 
     <img src = "Image/프론트.png">
 
@@ -75,14 +84,14 @@
     <img src = "Image/1.jpeg">
 
 
-### JSP
+## JSP
   - HTML내에 자바 코드를 삽입하여 웹 서버에서 동적으로 웹페이지를 생성하여 웹브라우저를 돌려주는 언어
   - JSP(Java Server Pages)는 서블릿 기술을 활용하여 동작하는 웹 프로그래밍 기술입니다.
   - JSP는 서블릿 코드를 자동으로 생성하고, 이를 서블릿 컨테이너에서 실행시킵니다.<br> 따라서 JSP는 사실상 서블릿으로 변환되어 실행되는 것이 맞습니다.
   - <img src = "Image/jsp2.png">
 
 
-### Was vs Servlet Container
+## Was vs Servlet Container
   - **Was는 서블릿 컨테이너를 포함하는 개념**
   - Was는 매 요청마다 스레드 풀에서 기존스레드를 사용한다
   - Was의 주요 튜닝 포인트는 max thread수
@@ -99,7 +108,7 @@
 
 
 
-### JDBC
+## JDBC
   - 자바에서 DB프로그래밍을 하기위해 사용되는 API
   - **DBCP** : 미리 일정량의 DB커넥션을 생성해서 풀에 저장해 두고있다가 HTTP 요청에 따라 필요할 때 **풀에서 커넥션을 가져다 사용하는 기법**
   - 참고로 스프링 부트 2.0부터는 디폴트 커넥션 풀로 **HikariC**P사용
@@ -111,7 +120,7 @@
     
 
 
-### Web.xml
+## Web.xml
   - `web.xml`에서 서블릿 맵핑 되는 방법, 인증이 필요한 URL등의 정보를 확인한다
   - `web.xml`은 WebApplication의 Deployment Descriptor(배포 설명자)로써 XML형식의 파일
   - 모든 Web application은 반드시 하나의 Web.xml파일을 가져야 하고 위치는 WEB-INF폴더 아래에 있다
@@ -131,7 +140,7 @@
   ```
 
 
-### Servlet/Spring 에서 Web.xml은 어떻게 사라졌을까?
+## Servlet/Spring 에서 Web.xml은 어떻게 사라졌을까?
 - Servlet에서는 web.xml은 SPI(**Service Provider Interface**) 기술을 통해 xml을 없앨 수 있었다
 - Spring-Legacy에서는 HandlesTypes 어노테이션에 <br> WebApplicationInitilizer을 지정하여 효율적으로 사용할 수 있었다
 - Spring-Boot에서는 Auto-Configuration, Spring Container 대체, 빈 설정 등으로 간편하게 사용할 수 있었다.
@@ -153,6 +162,8 @@
   - 그래들(Gradle)
     - 그래들은 가장 최근에 나온 자바 빌드 도구로 그루비 문법을 사용한다
     - Build.gradle에 스크립트를 작성하며, 대규모 프로젝트에서 복잡해지는 경향이 있는 XML기반 스크립트에 비해 관리가 편하다
+
+
 ## ANT
   - 자바 기반의 빌드 툴
     - Ant는 자바기반으로 플랫폼에 독립적으로 실행(운영체제에 구애받지 않고 프로젝트 진행가능)
@@ -208,6 +219,8 @@
       - Hotfix 작업이 끝나면 Master Branch에 Merge한다
       - Dev Branch에 Master Branch를 **merge**하여 Master와 Dev의 Sync를 맞춘다
       - 이후 신규 작업은 Dev Branch를 Base로 새로운 Feature Branch를 생성한다
+
+
 
 ## Multi Module
   - **Multi Module이란**
@@ -277,11 +290,12 @@
     `./gradlew clean :module-api:buildNeeded --stacktrace --info --refresh-dependencies -x test`
     - Module build(test 제외)
 
-  - ### Profile
-    - 실제 프로젝트에서는 밑의 사진과 같은 파일로 환경별 Property를 구분한다
+
+## Profile
+  - 실제 프로젝트에서는 밑의 사진과 같은 파일로 환경별 Property를 구분한다
       <img src = "Image/profile1.png">
-        - 인텔리제이 상에서는 Active profiles를 원하는 환경으로 바꿔주고 구동하면 되고,
-        - 인텔리제이같은 IDE를 사용하지않는경우<br> `java -jar -Dspring.profiles.active=local module-api-0.0.1-SNAPSHOT.jar`로 환경변수를 지정한 채 실행 가능
+      - 인텔리제이 상에서는 Active profiles를 원하는 환경으로 바꿔주고 구동하면 되고,
+      - 인텔리제이같은 IDE를 사용하지않는경우<br> `java -jar -Dspring.profiles.active=local module-api-0.0.1-SNAPSHOT.jar`로 환경변수를 지정한 채 실행 가능
     ``` groovy
         //application-beta.yml 내부
 
@@ -296,7 +310,8 @@
             hibernate:
               ddl-auto: create
             show-sql: true
-      ```
+    ```
+
 
 ## 비동기 프로그래밍
   - 실시간성 응답을 필요로 하지 않는 상황에서 사용한다
