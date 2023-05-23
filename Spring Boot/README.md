@@ -190,7 +190,7 @@
         - 자바코드를 읽어서 BeanDefinition을 만든다
         - 즉, 스프링 컨테이너는 자바코드인지, XML인지 몰라도 되며 오직 BeanDefinition만 알면 된다
         - **역할**과 **구현**의 분리
-        
+
       <img src = "image/beandefiniton.png">
 
        ```java
@@ -230,19 +230,26 @@
 
     - `@Configuration`과 바이트코드 조작의 마법
       - `@Configuration`을 적용한 `AppConfig.class` 또한 스프링 빈으로 등록이되는데,<br> 스프링이 CGLIB라는 바이트코드 조작 라이브러리를 사용해서 `AppConfig클래스`를 상속받은 임의의 다른 클래스를 만들고 그 다른 클래스를 스프링 빈으로 등록한다.
+
       <img src = "image/cglib.png">
+
       - `AppConfig@CGLIB`는 `AppConfig`의 자식타입이므로, `AppConfig` 타입으로 조회 할 수 있다
       - `@Configuration`를 제거하면 싱글톤을 보장하지 않는다 <br>즉, 같은 인스턴스를 공유하지 않는다 
         - 빈으로 등록은 되지만, 각각 다른 인스턴스를 가지고 있다
+
         - <img src = "image/Bean.png">
+
         - <img src = "image/Bean2.png">
+
         - 스프링 컨테이너가 관리하는 자바 객체(빈)는 하나인걸 알 수 있다 하지만, <br> `new연산자`를 통해 어떤 객체를 2번 더 생성하는데 그 객체는 빈이 아니다(각기 다른 인스턴스)
+
         - 저장되는 인스턴스들은 다르고 빈의 등록되는 객체는 하나! -> `memberRepository`의 인스턴스와 빈의 등록되는 인스턴스가 같은 것을 보고 알 수 있다 <br> `memberService`와 `orderService`가 호출하는 `new MemberRepository`는 빈을 활용하는 것이 아니다 (새로운 인스턴스를 생성)
 
 
   - ### (5) 컴포넌트 스캔
     - 자동을 스프링 빈을 등록하는 컴포넌트 스캔이라는 기능을 사용
     - 의존관게 자동 주입 `@Autowired`
+
     ```java
     @Configuration
     @ComponentScan(excludeFilters = @Filter(type = FilterType.ANNOTATION, classes = Configuration.class))
@@ -255,7 +262,9 @@
     - 앞서 만들어두었던 설정정보는 컴포넌트 스캔 대상에서 제외했다 -> AutoAppConfig는 등록된다  
 
     - <img src = "image/componnent.png">
+
     - <img src = "image/componnent2.png">
+
     - 스프링 부트를 사용하면 스프링 부트의 대표 시작 정보인 `@SpringBootApplication`를 이 프로젝트<br>시작 루트 위치에 두는 것이 관례다(안에 `@ComponentScan`이 들어있으므로 `@ComponentScan`를 써주지 않아도 된다.
 
 
@@ -418,11 +427,15 @@
         <img src = "image/anno.png">
 
     - 조회한 빈이 모두 필요할 때, **List Map**
+
       <img src = "image/list.png">
     
     - ### 자동, 수동의 올바른 실무운영 기준(자주 읽자)
+
       <img src = "image/core.png">
+
       <img src = "image/core2.png">
+
       <img src = "image/core3.png">
 
 
@@ -486,13 +499,18 @@
         }
         ```
       - 프로토 타입 스코프 빈
+
         <img src = "image/prototype.png">
+
         - 클라이언트에 빈을 반환하고, 이후 스프링 컨테이너는 생성된 프로토 타입 빈을 관리하지 않는다
         - `@PreDestroy`같은 종료 메서드가 호출되지 않는다
     
     - 프로토타입 스코프와 싱글톤 스코프를 함께 사용할 경우 발생하는 문제점
+
       <img src = "image/together.png">
+
       <img src = "image/together2.png">
+
       ```java
       static class ClientBean{
         private final PrototypeBean prototypeBean;
@@ -565,6 +583,7 @@
         - session : HTTP Session과 동일한 생명주기를 가지는 스코프
         - applicaiton : 서블릿 컨텍스트(**ServletContext**)와 동일한 생명주기를 가지는 스코프
         - websocket : 웹 소켓과 동일한 생명주기를 가지는 스코프
+        
       <img src = "image/request.png">
 
 
