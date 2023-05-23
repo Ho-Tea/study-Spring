@@ -190,7 +190,9 @@
         - 자바코드를 읽어서 BeanDefinition을 만든다
         - 즉, 스프링 컨테이너는 자바코드인지, XML인지 몰라도 되며 오직 BeanDefinition만 알면 된다
         - **역할**과 **구현**의 분리
+        
       <img src = "image/beandefiniton.png">
+
        ```java
         public class BeanDefinitionTest {
             AnnotationConfigApplicationContext ac = new
