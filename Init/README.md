@@ -293,7 +293,9 @@
 
 ## Profile
   - 실제 프로젝트에서는 밑의 사진과 같은 파일로 환경별 Property를 구분한다
+
       <img src = "Image/profile1.png">
+      
       - 인텔리제이 상에서는 Active profiles를 원하는 환경으로 바꿔주고 구동하면 되고,
       - 인텔리제이같은 IDE를 사용하지않는경우<br> `java -jar -Dspring.profiles.active=local module-api-0.0.1-SNAPSHOT.jar`로 환경변수를 지정한 채 실행 가능
     ``` groovy
